@@ -1,0 +1,7 @@
+{
+    "production": true,
+    "apiPort": 8080,
+    "apiPrefix": "/api/",
+    "serveStaticPath": "./public/",
+    "serveSwagger": false
+}
