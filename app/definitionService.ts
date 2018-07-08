@@ -3,7 +3,7 @@ const fs = require('fs-extra')
 import * as _ from 'lodash'
 import * as path from 'path'
 
-import { DefinitionSchema } from './'
+import { DefinitionSchema } from './schemas'
 
 export class DefinitionService {
     private _defs: Array<DefinitionSchema> = []

@@ -1,2 +1,2 @@
 export * from './definitionService'
-export * from './definitionSchema'
+export * from './conditionerService'
