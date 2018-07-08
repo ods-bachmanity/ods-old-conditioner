@@ -3,7 +3,7 @@ import { DefinitionService } from '../app'
 
 export class DefinitionRoute {
     
-    private _definitionService = new DefinitionService()
+    private _definitionService = new DefinitionService(this.errorHandler)
 
     public constructor (private server: any, private errorHandler: ErrorHandler) {
 
@@ -29,12 +29,8 @@ export class DefinitionRoute {
                 return next()     
             }
             catch (err) {
-                if (err === 404) {
-                    res.send(404, `Unable to find resource ${req.params.id}`)
-                    return next()
-                }
                 console.error(err)
-                res.send(500, this.errorHandler.errorMessage('DefinitionRoute:Error'))
+                res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()
             }
 

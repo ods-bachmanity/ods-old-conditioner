@@ -4,11 +4,12 @@ import * as _ from 'lodash'
 import * as path from 'path'
 
 import { DefinitionSchema } from './schemas'
+import { ErrorHandler } from '../common'
 
 export class DefinitionService {
     private _defs: Array<DefinitionSchema> = []
 
-    constructor() {}
+    constructor(private errorHandler: ErrorHandler) {}
 
     public get(id: string): Promise<DefinitionSchema> {
 
@@ -31,13 +32,16 @@ export class DefinitionService {
                 return resolve(def)
             }
             catch (err) {
+                const error = this.errorHandler.errorResponse(`DefinitionService.get(${id})`, 
+                    500, err.message ? err.message : `Invalid Definition Id`, err)
                 if (err.code === 'ENOENT') {
                     console.error(`DefinitionService.get(${id}).error: Unable to find definition file @${filePath}`)
-                    return reject(404)
+                    error.httpStatus = 404
+                    return reject(error)
                 }
                 console.error(`DefinitionService.get(${id}).error:`)
                 console.error(`${JSON.stringify(err, null, 2)}`)
-                return reject(err)
+                return reject(error)
             }
 
         })

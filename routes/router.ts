@@ -25,7 +25,7 @@ export class Router {
         // Conditioner Route
         // api/conditioner/:id
         const conditionerRoute = new ConditionerRoute(this.server, this.errorHandler)
-        conditionerRoute.init(baseUri + 'conditioner/:id')
+        conditionerRoute.init(baseUri + 'conditioner/:definitionId')
 
         /*
             Place all handler routes above this section
