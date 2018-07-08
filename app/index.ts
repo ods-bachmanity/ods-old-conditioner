@@ -1,1 +1,2 @@
-export * from './helloWorldService'
+export * from './definitionService'
+export * from './definitionSchema'

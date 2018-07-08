@@ -15,7 +15,7 @@ export class HealthCheckRoute {
                 const result = await HealthCheckService.get()
                 res.send(200, result)
             
-                return next();        
+                return next() 
             }
             catch (err) {
                 console.error(err)

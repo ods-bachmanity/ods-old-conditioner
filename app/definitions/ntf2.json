@@ -1,0 +1,36 @@
+{
+    "id": "ntf2",
+    "description": "Handle all NITF2.0 and NITF2.1 files from WorldView and Digital Globe",
+    "references": {
+        "composers": [
+
+        ],
+        "validators": [
+    
+        ],
+        "transforms": [
+    
+        ],
+        "conditions": [
+
+        ],
+        "maps": [
+
+        ],
+        "formatters": [
+
+        ],
+        "translators": [
+
+        ],
+        "actions": [
+
+        ],
+        "response": {
+
+        }
+    },
+    "strategy": [
+
+    ]
+}

@@ -1,4 +1,4 @@
-import { ErrorHandler, SwaggerService } from '../common/'
+import { ErrorHandler, SwaggerService } from '../common'
 
 export class SwaggerRoute {
     

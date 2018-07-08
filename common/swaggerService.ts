@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as config from 'config'
 
-import { Utilities, ErrorHandler } from '../common'
+import { Utilities, ErrorHandler } from '.'
 
 export class SwaggerService {
 
