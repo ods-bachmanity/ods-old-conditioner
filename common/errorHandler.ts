@@ -43,7 +43,7 @@ export class ErrorHandler {
 
     }
 
-    public errorResponse(source: string, httpStatus: number, message: string, err: any): ErrorSchema {
+    public static errorResponse(source: string, httpStatus: number, message: string, err: any): ErrorSchema {
         const errorSchema = new ErrorSchema()
         errorSchema.debug = (!config.production ? source : null)
         errorSchema.httpStatus = httpStatus || 500

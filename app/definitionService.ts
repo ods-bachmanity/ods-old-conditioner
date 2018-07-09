@@ -7,9 +7,10 @@ import { DefinitionSchema } from './schemas'
 import { ErrorHandler } from '../common'
 
 export class DefinitionService {
+    
     private _defs: Array<DefinitionSchema> = []
 
-    constructor(private errorHandler: ErrorHandler) {}
+    constructor() {}
 
     public get(id: string): Promise<DefinitionSchema> {
 
@@ -32,7 +33,7 @@ export class DefinitionService {
                 return resolve(def)
             }
             catch (err) {
-                const error = this.errorHandler.errorResponse(`DefinitionService.get(${id})`, 
+                const error = ErrorHandler.errorResponse(`DefinitionService.get(${id})`, 
                     500, err.message ? err.message : `Invalid Definition Id`, err)
                 if (err.code === 'ENOENT') {
                     console.error(`DefinitionService.get(${id}).error: Unable to find definition file @${filePath}`)

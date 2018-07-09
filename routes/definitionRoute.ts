@@ -1,11 +1,10 @@
-import { ErrorHandler } from '../common'
 import { DefinitionService } from '../app'
 
 export class DefinitionRoute {
     
-    private _definitionService = new DefinitionService(this.errorHandler)
+    private _definitionService = new DefinitionService()
 
-    public constructor (private server: any, private errorHandler: ErrorHandler) {
+    public constructor (private server: any) {
 
     }
 
@@ -29,7 +28,7 @@ export class DefinitionRoute {
                 return next()     
             }
             catch (err) {
-                console.error(err)
+                console.error(`DefinitionRoute.init.get(${path}): ${JSON.stringify(err)}`)
                 res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()
             }

@@ -1,12 +1,12 @@
-import { ErrorHandler, SwaggerService } from '../common'
+import { SwaggerService } from '../common'
 
 export class SwaggerRoute {
     
-    public constructor (private server: any, private errorHandler: ErrorHandler) {}
+    public constructor (private server: any) {}
 
     public init (path: string) {
 
-        const swaggerService = new SwaggerService(this.server, this.errorHandler)
+        const swaggerService = new SwaggerService(this.server)
 
         this.server.get(path, async (req, res, next) => {
 
@@ -21,7 +21,7 @@ export class SwaggerRoute {
             }
             catch (err) {
                 console.error(err)
-                res.send(500, this.errorHandler.errorMessage('HelloWorldRoute:Error'))
+                res.send(500, err)
                 return next()
             }
 

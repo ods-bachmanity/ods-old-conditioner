@@ -1,10 +1,16 @@
 {
     "id": "ntf2",
     "description": "Handle all NITF2.0 and NITF2.1 files from WorldView and Digital Globe",
+    "composers": [
+        {
+            "className": "ElasticSearchComposer",
+            "args": [
+                {"key": "endpoint", "value": "env.ELASTICSEARCHGET"},
+                {"key": "auth", "value": "basic"}
+            ]
+        }
+    ],
     "references": {
-        "composers": [
-
-        ],
         "validators": [
     
         ],

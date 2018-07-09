@@ -14,17 +14,17 @@ export class Router {
 
         // Health Check
         // api/health
-        const healthCheckRoute = new HealthCheckRoute(this.server, this.errorHandler)
+        const healthCheckRoute = new HealthCheckRoute(this.server)
         healthCheckRoute.init(baseUri + 'health')
 
         // Definition Route
         // api/definition/:id
-        const definitionRoute = new DefinitionRoute(this.server, this.errorHandler)
+        const definitionRoute = new DefinitionRoute(this.server)
         definitionRoute.init(baseUri + 'definition/:id')
 
         // Conditioner Route
         // api/conditioner/:id
-        const conditionerRoute = new ConditionerRoute(this.server, this.errorHandler)
+        const conditionerRoute = new ConditionerRoute(this.server)
         conditionerRoute.init(baseUri + 'conditioner/:definitionId')
 
         /*
@@ -34,7 +34,7 @@ export class Router {
         */
         if (config.serveSwagger) {
             console.log('Serving swagger content')
-            const swaggerRoute = new SwaggerRoute(this.server, this.errorHandler)
+            const swaggerRoute = new SwaggerRoute(this.server)
             swaggerRoute.init('/swagger.io')
         }
 
@@ -56,7 +56,7 @@ export class Router {
 
         // Handle 404
         this.server.on('NotFound', (req, res, next) => {
-            res.send(404, this.errorHandler.errorMessage(`Unable to locate resource: ${req.url}`))
+            res.send(404, `Unable to locate resource: ${req.url}`)
         })
     }
 

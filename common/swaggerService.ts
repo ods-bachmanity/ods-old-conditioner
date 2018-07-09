@@ -1,12 +1,12 @@
 import * as path from 'path'
 import * as config from 'config'
 
-import { Utilities, ErrorHandler } from '.'
+import { Utilities } from '.'
 
 export class SwaggerService {
 
     private _fileContents: string = ''
-    constructor (private server, private errorHandler: ErrorHandler) {
+    constructor (private server) {
 
         const swaggerFilePath = path.join(process.cwd(), 'swagger.json')
         if (Utilities.fileExists(swaggerFilePath)) {

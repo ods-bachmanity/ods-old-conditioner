@@ -1,8 +1,8 @@
-import { HealthCheckService, ErrorHandler } from '../common'
+import { HealthCheckService } from '../common'
 
 export class HealthCheckRoute {
     
-    public constructor (private server: any, private errorHandler: ErrorHandler) {}
+    public constructor (private server: any) {}
 
     public init (path: string) {
 
@@ -15,11 +15,11 @@ export class HealthCheckRoute {
                 const result = await HealthCheckService.get()
                 res.send(200, result)
             
-                return next() 
+                return next()
             }
             catch (err) {
                 console.error(err)
-                res.send(500, this.errorHandler.errorMessage('HealthCheckRoute:Error'))
+                res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()
             }
 

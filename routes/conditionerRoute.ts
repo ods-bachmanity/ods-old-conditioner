@@ -1,12 +1,11 @@
-import { ErrorHandler } from '../common'
 import { ConditionerService } from '../app'
 import { ConditionerResponseSchema } from '../app/schemas'
 
 export class ConditionerRoute {
     
-    private _conditionerService = new ConditionerService(this.errorHandler)
+    private _conditionerService = new ConditionerService()
 
-    public constructor (private server: any, private errorHandler: ErrorHandler) {
+    public constructor (private server: any) {
 
     }
 
@@ -30,7 +29,7 @@ export class ConditionerRoute {
                 return next()
             }
             catch (err) {
-                console.error(`ConditionerRoute.init.post(${path}): ${err}`)
+                console.error(`ConditionerRoute.init.post(${path}): ${JSON.stringify(err)}`)
                 res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()
             }
