@@ -1,5 +1,5 @@
-# restify server
-Default scaffold for restify server in node. This is a work in progress.
+# ODS Conditioner (Workengine)
+Compose, Validate, Transform, Act and Respond on Imagery metadata for ODS Metadata Catalog
 
 ## environment
 Begin with `npm install`.
