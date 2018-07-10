@@ -6,13 +6,10 @@ const rp = require('request-promise')
 
 export class CountryCodeTransform extends BaseTransform {
 
-    private _servicePath: string
+    private _servicePath: string = process.env.COUNTRYCODESERVICEURL
 
     constructor(executionContext: ExecutionContext, transformDef: TransformDefSchema, fieldName: string) {
         super(executionContext, transformDef, fieldName)
-
-        this._servicePath = process.env.COUNTRYCODESERVICEURL
-
     }
 
     public fx(): Promise<Boolean> {
@@ -42,7 +39,7 @@ export class CountryCodeTransform extends BaseTransform {
             }
             catch (err) {
                 console.error(`CountryCodeTransform.fx().error: ${JSON.stringify(err)}`)
-                return resolve(false)
+                return reject(false)
             }
             
         })
@@ -75,7 +72,7 @@ export class CountryCodeTransform extends BaseTransform {
             catch (err) {
                 console.log('ERROR:countryCodeTransform.callService');
                 console.error(err);
-                return resolve(null);
+                return reject(false);
             }
             
         })

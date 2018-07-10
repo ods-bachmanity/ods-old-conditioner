@@ -3,9 +3,10 @@ import { ConditionerResponseSchema } from '../app/schemas'
 import { ExecutionContext } from '../app/executionContext';
 import { DefinitionService } from '../app/definitionService';
 
+import * as _ from 'lodash'
+
 export class BulkConditionerRoute {
     
-    private _conditionerService = new ConditionerService()
     private _definitionService = new DefinitionService()
 
     public constructor (private server: any) {
@@ -50,7 +51,9 @@ export class BulkConditionerRoute {
                             executionContext.addParameter(item.key, item.value, mockRequestBody)
                         })
                     }
-                    workItems.push(this._conditionerService.execute(executionContext))
+                    const conditionerService = new ConditionerService()
+
+                    workItems.push(conditionerService.execute(executionContext))
                 })
                 const result: Array<ConditionerResponseSchema> = await Promise.all(workItems)
                 res.send(200, result)

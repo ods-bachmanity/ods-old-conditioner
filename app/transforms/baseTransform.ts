@@ -1,4 +1,4 @@
-import { DefinitionSchema, TransformDefSchema, KeyValuePair } from '../schemas'
+import { DefinitionSchema, TransformDefSchema, Coordinate } from '../schemas'
 import { ExecutionContext } from '../'
 
 import * as _ from 'lodash'
@@ -76,10 +76,4 @@ export class BaseTransform {
         return output;
     }
 
-}
-
-class Coordinate {
-    Longitude: string = '';
-    Latitude: string = '';
-    Height: string = '';
 }
