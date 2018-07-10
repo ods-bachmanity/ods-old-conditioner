@@ -3,7 +3,7 @@ import * as restify from 'restify'
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { HealthCheckRoute, SwaggerRoute, DefinitionRoute, ConditionerRoute } from '.'
+import { HealthCheckRoute, SwaggerRoute, DefinitionRoute, ConditionerRoute, BulkConditionerRoute } from '.'
 import { ErrorHandler } from '../common'
 
 export class Router {
@@ -26,6 +26,11 @@ export class Router {
         // api/conditioner/:id
         const conditionerRoute = new ConditionerRoute(this.server)
         conditionerRoute.init(baseUri + 'conditioner/:definitionId')
+
+        // Bulk Conditioner Route
+        // api/conditioner/bulk/:definition
+        const bulkConditionerRoute = new BulkConditionerRoute(this.server)
+        bulkConditionerRoute.init(baseUri + 'conditioner/bulk/:definitionId')
 
         /*
             Place all handler routes above this section
