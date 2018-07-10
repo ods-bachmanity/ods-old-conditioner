@@ -1,18 +1,18 @@
-import { DefinitionSchema, ComposerDefSchema, KeyValuePair, AuthenticationStrategies } from '../schemas'
+import { ActionDefSchema, DefinitionSchema, AuthenticationStrategies, KeyValuePair } from "../schemas";
+import { ExecutionContext } from '../'
 
 import * as _ from 'lodash'
 
-export class BaseComposer {
+export class BaseAction {
 
     protected definition: DefinitionSchema
     protected authenticationStrategy: AuthenticationStrategies = AuthenticationStrategies.none
 
-    public constructor(protected executionContext: any, 
-        protected composerDef: ComposerDefSchema) {
-            this.definition = executionContext.definition
-        
-        if (composerDef && composerDef.args && composerDef.args.length > 0) {
-            const record: KeyValuePair = _.find(composerDef.args, { key: 'auth'} )
+    constructor(protected executionContext: ExecutionContext, protected actionDef: ActionDefSchema) {
+        this.definition = executionContext.definition
+
+        if (actionDef && actionDef.args && actionDef.args.length > 0) {
+            const record: KeyValuePair = _.find(actionDef.args, { key: 'auth'} )
             if (record) {
                 switch (record.value) {
                     case 'basic':
@@ -27,8 +27,9 @@ export class BaseComposer {
     }
 
     public fx(): Promise<any> {
-        console.log('BaseComposer Ran')
-        return Promise.resolve({})
-    }
 
+        return Promise.resolve({})
+
+    }
+    
 }

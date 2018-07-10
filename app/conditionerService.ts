@@ -1,6 +1,7 @@
 import { ErrorHandler } from '../common'
-import { ConditionerResponseSchema, ComposerDefSchema, DefinitionSchema } from './schemas'
+import { ConditionerResponseSchema, ConditionerExecutionSchema } from './schemas'
 import { ExecutionContext } from './executionContext';
+import { exec } from 'child_process';
 
 export class ConditionerService {
     
@@ -10,16 +11,18 @@ export class ConditionerService {
 
         const result: Promise<ConditionerResponseSchema> = new Promise(async (resolve, reject) => {
 
-            const response = new ConditionerResponseSchema()
+            const activity = new ConditionerExecutionSchema()
             try {
 
-                response.source = await executionContext.compose()
+                activity.source = await executionContext.compose()
 
-                response.transformed = await executionContext.schema()
+                activity.transformed = await executionContext.schema()
 
-                response.map = await executionContext.map()
+                activity.map = await executionContext.map()
+
+                activity.actions = await executionContext.act()
                 
-                return resolve(response)
+                return resolve(this.composeResponse(Object.assign({}, activity), Object.assign({}, executionContext)))
 
             }
             catch (err) {
@@ -33,6 +36,24 @@ export class ConditionerService {
         })
 
         return result
+
+    }
+
+    private composeResponse(activity: ConditionerExecutionSchema, executionContext: ExecutionContext): ConditionerResponseSchema {
+
+        const response = new ConditionerResponseSchema()
+
+        response.fileUri = activity.transformed.FileUri
+        response.fingerprint = activity.transformed.FingerPrint
+        response.version = executionContext.parameters['version']
+        response.contentId = activity.transformed.FingerPrint
+        response.data = activity.map
+        response.ods_code = activity.code
+        response.ods_errors = []
+        response.ods_definition = executionContext.definition.id
+        response.emc = activity.actions
+        
+        return response
 
     }
 

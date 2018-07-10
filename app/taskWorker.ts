@@ -86,6 +86,7 @@ export class TaskWorker {
                         return reject(this.errorResponse(`A problem occurred while running a transform on field ${this.fieldSchema.field}`))
                     }
                 }
+                
                 // CHECK fieldSchema.after for any transforms to run after initials complete
                 if (this.fieldSchema.after && this.fieldSchema.after.length > 0) {
                     const tasks = []

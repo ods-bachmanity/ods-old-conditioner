@@ -1,4 +1,4 @@
-import { DefinitionSchema, ComposerDefSchema, FieldSchema, MapDefSchema } from './schemas'
+import { DefinitionSchema, ComposerDefSchema, FieldSchema, MapDefSchema, ActionDefSchema } from './schemas'
 import { ComposerFactory, BaseComposer } from './composers'
 import { ErrorHandler, Utilities } from '../common'
 import { TaskWorker } from './'
@@ -6,14 +6,17 @@ import { TaskWorker } from './'
 import * as config from 'config'
 import * as _ from 'lodash'
 import { isNullOrUndefined } from 'util';
+import { ActionFactory } from './actions';
 
 export class ExecutionContext {
 
     public source: any = {}
     public transformed: any = {}
     public parameters: any = {}
+    public mapped: any = {}
 
     private _composerFactory = new ComposerFactory()
+    private _actionFactory = new ActionFactory()
 
     public constructor(public definition: DefinitionSchema) {}
 
@@ -133,14 +136,48 @@ export class ExecutionContext {
                     })
 
                 }
-
-                return resolve(Object.assign({}, mapObject))
+                this.mapped = Object.assign({}, mapObject)
+                return resolve(this.mapped)
 
             }
             catch (err) {
                 console.error(`ExecutionContext.map().error:`)
                 console.error(`${JSON.stringify(err, null, 2)}`)
                 const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.map().error`,
+                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
+                return reject(errorSchema)
+            }
+
+        })
+
+        return result
+
+    }
+
+    public act(): Promise<any> {
+
+        const result = new Promise(async (resolve, reject) => {
+
+            try {
+
+                const actions = this.definition.actions
+                if (actions && actions.length > 0) {
+
+                    const tasks: Array<any> = []
+                    actions.forEach((actionDef: ActionDefSchema) => {
+                        const action = this._actionFactory.CreateInstance(this, actionDef)
+                        tasks.push(action.fx())
+                    })
+                    const response = await Promise.all(tasks)
+                    return resolve(response)
+                } else {
+                    return resolve()
+                }
+            }
+            catch (err) {
+                console.error(`ExecutionContext.act().error:`)
+                console.error(`${JSON.stringify(err, null, 2)}`)
+                const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.act().error`,
                     err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
                 return reject(errorSchema)
             }

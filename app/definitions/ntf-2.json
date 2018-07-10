@@ -1,5 +1,5 @@
 {
-    "id": "ntf2",
+    "id": "ntf-2",
     "description": "Handle all NITF2.1 files from WorldView",
     "parameters": [
         {"key": "fileuri", "value": "req.body.fileuri"},
@@ -7,7 +7,8 @@
         {"key": "version", "value": "req.body.version||0"},
         {"key": "username", "value": ".env.ELASTICUID"},
         {"key": "password", "value": ".env.ELASTICPWD"},
-        {"key": "catalog_endpoint_search", "value": "req.body.catalog_endpoint_search||req.params.catalog_endpoint_search||.env.EMCCATALOGSERVICEURLGET"}
+        {"key": "catalog_endpoint_search", "value": "req.body.catalog_endpoint_search||.env.EMCCATALOGSERVICEURLGET"},
+        {"key": "catalog_endpoint_update", "value": "req.body.catalog_endpoint_update||.env.EMCCATALOGSERVICEURLPOST"}
     ],
     "composers": [
         {
@@ -128,6 +129,14 @@
         {
             "source": "Metadata.GENC_NAMES",
             "target": "resourcegeographiclocation.geojson.properties.name"
+        }
+    ],
+    "actions": [
+        {
+            "className": "ElasticUpdateAction",
+            "args": [
+                {"key": "auth", "value": "basic"}
+            ]
         }
     ]
 }

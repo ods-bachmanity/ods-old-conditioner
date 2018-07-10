@@ -1,4 +1,4 @@
-import { ComposerDefSchema, FieldSchema, KeyValuePair, MapDefSchema } from './'
+import { ComposerDefSchema, FieldSchema, KeyValuePair, MapDefSchema, ActionDefSchema } from './'
 
 export class DefinitionSchema {
     public id: string
@@ -8,4 +8,5 @@ export class DefinitionSchema {
     public schema: Array<FieldSchema>
     public mapStructure: any
     public maps: Array<MapDefSchema>
+    public actions: Array<ActionDefSchema>
 }

@@ -1,4 +1,5 @@
-import { BaseComposer, AuthenticationStrategies } from '.'
+import { BaseComposer } from '.'
+import { AuthenticationStrategies } from '../schemas'
 import { ErrorHandler } from '../../common'
 
 import * as rp from 'request-promise'
