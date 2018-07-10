@@ -1,5 +1,26 @@
-# ODS Conditioner (Workengine)
+# ODS Conditioner (Work Engine)
 Compose, Validate, Transform, Act and Respond on Imagery metadata for ODS Metadata Catalog
+
+## latest
+- **Testing**: Support for Mocha/Chai Unit Tests compiled alongside core code. Execution of tests as part of local development or as part of a development build. Tests can be built and executed using TypeScript (strongly typed JavaScript).
+- **Deployment (Test)**: `npm run build` creates a local `./_build` directory with code ready for deployment into a testing environment. Code is optimized to support execution of Unit Tests.
+- **Deployment (Prod)**: `npm run bundle` creates a local `./_bundle` directory with code ready for production deployment. Any development related artifacts and unit tests are stripped from the project to reduce footprint.
+- **More developer friendly execution**: shift from separate development and live reload folder into a cohesive and single development environment. Reduce the need for developers to execute external build processes.
+- **New Schema Layout**: focus on more human readable and intuitive schema for definitions of composers, validations, transforms and actions.
+- **Consistent Error Handling**: A single approach for handling of runtime errors. Console logging as well as decoration of an Execution Context. TODO: `ExecutionContext.logs && ExecutionContext.errors`
+- **Execution Context**: a new engine approach with dynamic parameters, composition, action
+- **Separate Mock Service**: relocate mocking services out of the conditioner project and into a separate, autonomous project.
+- **Support for Request Parameters**: New `catalog_endpoint_search` and `catalog_endpoint_update` parameters allow dynamic execution of action read and update
+- **Authentication**: Introduce new mechanism for authentication (currently basic only) available for setup for composers and actions. Preparation for OAuth implementation
+- **Separate services from Routes**: Separation of Concerns for services offering a better interface for Unit Testing.
+- **Support for Single or Bulk Requests**: as before, endpoint support for a single request or a bulk collection of requests on a single endpoint.
+- **Ordinal Workflow**: track and control transform execution using staged steps e.g. Ordinal 1 Fields are executed asynchronously before Ordinal 2 Fields. Each stage also affords an `after` step. For example: Ordinal 1 stage may validate and verify all required fields, Ordinal 2 stage can transform Coordinates and perform a conversion before finally having Ordinal 2's `after` step execute Country Code Lookup.
+- **Prepared for New Fields**: research in preparation for new fields being introduced into definition schema.
+- **Strong Definition Logic**: Support in definition for conditional logic such as switch case, required fields, white list, black list. TODO: RegEx, DataType(number, date, boolean)
+- **Deployment (Docker)**: TODO: `npm run docker` creates a local `./docker` directory with code packaged ready for docker instantiation. IN PROGRESS.
+- **Parameter Precondition Automated**: TODO: using definition, allow author to describe mandatory parameters with values vs. optional.
+
+
 
 ## environment
 Begin with `npm install`.
