@@ -1,9 +1,19 @@
 import { BaseTransform } from './'
-import { Utilities } from '../../common'
+import { ExecutionContext } from '../'
+import { TransformDefSchema } from '../schemas'
 
 const rp = require('request-promise')
 
 export class CountryCodeTransform extends BaseTransform {
+
+    private _servicePath: string
+
+    constructor(executionContext: ExecutionContext, transformDef: TransformDefSchema, fieldName: string) {
+        super(executionContext, transformDef, fieldName)
+
+        this._servicePath = process.env.COUNTRYCODESERVICEURL
+
+    }
 
     public fx(): Promise<Boolean> {
 
@@ -47,14 +57,13 @@ export class CountryCodeTransform extends BaseTransform {
 
             try {
 
-                const servicePath = process.env.COUNTRYCODESERVICEURL
-                if (!servicePath) {
+                if (!this._servicePath) {
                     return reject('Invalid Service Path for Country Code Service')
                 }
     
                 const response = await rp.post({
                     "headers": { "content-type": "application/json" },
-                    "url": servicePath,
+                    "url": this._servicePath,
                     "body": JSON.stringify({
                         "wkt": footprint
                     })
