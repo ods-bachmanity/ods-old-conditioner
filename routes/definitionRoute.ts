@@ -14,6 +14,9 @@ export class DefinitionRoute {
 
             try {
                 if (!req.params || !req.params.id) {
+                    res.contentType = 'application/json'
+                    res.header('Content-Type', 'application/json')
+                    
                     res.send(400, 'Bad Request')
                     return next()
                 }
@@ -28,7 +31,10 @@ export class DefinitionRoute {
                 return next()     
             }
             catch (err) {
-                console.error(`DefinitionRoute.init.get(${path}): ${JSON.stringify(err)}`)
+                console.error(`DefinitionRoute.init.get(${path}).error: ${JSON.stringify(err, null, 2)}`)
+                res.contentType = 'application/json'
+                res.header('Content-Type', 'application/json')
+                
                 res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()
             }

@@ -1,11 +1,12 @@
-import { BaseComposer, ElasticSearchComposer } from '.'
+import { BaseComposer, ElasticSearchComposer, TestComposer } from '.'
 import { ComposerDefSchema } from '../schemas'
 import { ExecutionContext } from '../'
 
 export class ComposerFactory {
 
     private _objects: any = {
-        ElasticSearchComposer
+        ElasticSearchComposer,
+        TestComposer
     }
 
     constructor() {}

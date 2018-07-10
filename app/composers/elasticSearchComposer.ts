@@ -1,4 +1,4 @@
-import { BaseComposer } from '.'
+import { BaseComposer, AuthenticationStrategies } from '.'
 import { ErrorHandler } from '../../common'
 
 import * as rp from 'request-promise'
@@ -11,35 +11,72 @@ export class ElasticSearchComposer extends BaseComposer {
         const result = new Promise(async (resolve, reject) => {
 
             try {
+                let url = this.executionContext.parameters.catalog_endpoint_search
+                if (this.authenticationStrategy === AuthenticationStrategies.basic) {
+                    const uname = this.executionContext.parameters.username
+                    const pw = this.executionContext.parameters.password
+                    if (uname && pw) {
+                        url = url.replace(`://`, `://${uname}:${pw}@`)
+                    }
+                }
+                // console.log(`ElasticSearchComposer.fx(): Calling ${url}`)
+                const payload: any = {
+                    q: `fingerprint:${this.executionContext.parameters.fingerprint}`,
+                    _source_includes: 'rawheader'
+                }
+
+                if (process.env.INCLUDEFILEURIINGET && process.env.INCLUDEFILEURIINGET === 'true') {
+                    payload.fileuri = this.executionContext.parameters.fileuri
+                }
+
                 const endpoint = {
-                    uri: 'http://localhost:8081/api/metadata/',
+                    uri: url,
                     simple: false,
-                    qs: '',
+                    qs: payload,
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 }
-        
-                if (!this.executionContext || !this.executionContext.body || !this.executionContext.body.fileuri) {
+
+                // console.log(JSON.stringify(this.executionContext, null, 2))
+                if (!this.executionContext || !this.executionContext.parameters || !this.executionContext.parameters.fileuri) {
                     const error = ErrorHandler.errorResponse(`ElasticSearchComposer.fx().try`,
                     400, 'Missing fileuri in Request body', null)
                     return reject(error)
                 }
-                endpoint.uri += this.executionContext.body.fileuri
+                
                 console.log(`Calling ${JSON.stringify(endpoint, null, 2)}`)
                 const response = await rp(endpoint)
-                const fileObject = JSON.parse(response)
-                
-                if (fileObject.httpStatus === 404) {
+                const body = JSON.parse(response)
+
+                if (body.httpStatus === 404) {
                     const error = ErrorHandler.errorResponse(`ElasticSearchComposer.fx().try.response`,
                     404, 'No record returned for request', null)
                     return reject(error)
                 }
-                if (fileObject.code && fileObject.code !== 0) {
+                if (body.code && body.code !== 0) {
                     const error = ErrorHandler.errorResponse(`ElasticSearchComposer.fx().try.response`,
-                    fileObject.httpStatus || 500, 'Error retrieving record for request', null)
+                    body.httpStatus || 500, 'Error retrieving record for request', null)
                     return reject(error)
                 }
+                if (!body 
+                    || !body.hits 
+                    || !body.hits.hits 
+                    || !body.hits.hits[0] 
+                    || !body.hits.hits[0]._source
+                    || !body.hits.hits[0]._source.rawheader) {
+                        const error = ErrorHandler.errorResponse(`ElasticSearchComposer.fx().try.response`,
+                        body.httpStatus || 500, 'Invalid Record Format returned from Elastic Search', null)
+                        return reject(error)
+                }
+                if (body.hits.total !== 1) {
+                    const error = ErrorHandler.errorResponse(`ElasticSearchComposer.fx().try.response`,
+                    body.httpStatus || 500, 'Invalid number of responses from Elastic Search returned', null)
+                    return reject(error)
+                }
+
+                const fileObject = JSON.parse(body.hits.hits[0]._source.rawheader)
+                // console.log(`elasticSearchComposer.fx: JSON response from metadataservice is ${JSON.stringify(fileObject, null, 2)}`)                
 
                 return resolve(fileObject)
             }

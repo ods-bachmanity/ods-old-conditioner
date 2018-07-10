@@ -20,7 +20,10 @@ export class SwaggerRoute {
                 return next();        
             }
             catch (err) {
-                console.error(err)
+                console.error(`SwaggerRoute.init.get(${path}).error: ${JSON.stringify(err, null, 2)}`)
+                res.contentType = 'application/json'
+                res.header('Content-Type', 'application/json')
+                
                 res.send(500, err)
                 return next()
             }

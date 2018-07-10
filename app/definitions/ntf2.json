@@ -1,14 +1,25 @@
 {
     "id": "ntf2",
-    "description": "Handle all NITF2.0 and NITF2.1 files from WorldView and Digital Globe",
+    "description": "Handle all NITF2.0 and NITF2.1 files from WorldView",
     "composers": [
         {
             "className": "ElasticSearchComposer",
             "args": [
-                {"key": "endpoint", "value": "env.ELASTICSEARCHGET"},
                 {"key": "auth", "value": "basic"}
             ]
+        },
+        {
+            "className": "TestComposer",
+            "args": []
         }
+    ],
+    "parameters": [
+        {"key": "fileuri", "value": "req.body.fileuri"},
+        {"key": "fingerprint", "value": "req.body.fingerprint||0"},
+        {"key": "version", "value": "req.body.version||0"},
+        {"key": "username", "value": ".env.ELASTICUID"},
+        {"key": "password", "value": ".env.ELASTICPWD"},
+        {"key": "catalog_endpoint_search", "value": "req.body.catalog_endpoint_search||req.params.catalog_endpoint_search||.env.EMCCATALOGSERVICEURLGET"}
     ],
     "references": {
         "validators": [
