@@ -1,6 +1,14 @@
 {
     "id": "ntf2",
-    "description": "Handle all NITF2.0 and NITF2.1 files from WorldView",
+    "description": "Handle all NITF2.1 files from WorldView",
+    "parameters": [
+        {"key": "fileuri", "value": "req.body.fileuri"},
+        {"key": "fingerprint", "value": "req.body.fingerprint||0"},
+        {"key": "version", "value": "req.body.version||0"},
+        {"key": "username", "value": ".env.ELASTICUID"},
+        {"key": "password", "value": ".env.ELASTICPWD"},
+        {"key": "catalog_endpoint_search", "value": "req.body.catalog_endpoint_search||req.params.catalog_endpoint_search||.env.EMCCATALOGSERVICEURLGET"}
+    ],
     "composers": [
         {
             "className": "ElasticSearchComposer",
@@ -13,41 +21,113 @@
             "args": []
         }
     ],
-    "parameters": [
-        {"key": "fileuri", "value": "req.body.fileuri"},
-        {"key": "fingerprint", "value": "req.body.fingerprint||0"},
-        {"key": "version", "value": "req.body.version||0"},
-        {"key": "username", "value": ".env.ELASTICUID"},
-        {"key": "password", "value": ".env.ELASTICPWD"},
-        {"key": "catalog_endpoint_search", "value": "req.body.catalog_endpoint_search||req.params.catalog_endpoint_search||.env.EMCCATALOGSERVICEURLGET"}
+    "schema": [
+        {
+            "field": "Metadata.NITF_FHDR",
+            "ordinal": 0,
+            "required": true,
+            "exactmatch": "NITF02.10"
+        },
+        {
+            "field": "Metadata.NITF_ICORDS",
+            "ordinal": 1,
+            "required": true,
+            "mustbeincase": true,
+            "whitelist": [
+                "D","G","N","S","U"
+            ],
+            "blacklist": [
+                "WILLNOTFAIL"
+            ],
+            "case": [
+                {
+                    "match": "D",
+                    "className": "DecimalDegreesCoordinateTransform",
+                    "args": []
+                },
+                {
+                    "match": "G",
+                    "className": "GeographicCoordinateTransform",
+                    "args": []
+                },
+                {
+                    "match": "N",
+                    "className": "UTMNCoordinateTransform",
+                    "args": []
+                },
+                {
+                    "match": "S",
+                    "className": "UTMSCoordinateTransform",
+                    "args": []
+                },
+                {
+                    "match": "U",
+                    "className": "UTMMGRSCoordinateTransform",
+                    "args": []
+                }
+            ],
+            "transforms-sample": [
+                {
+                    "className": "DecimalDegreesCoordinateTransform"
+                },
+                {
+                    "className": "GeographicCoordinateTransform"
+                },
+                {
+                    "className": "UTMNCoordinateTransform"
+                },
+                {
+                    "className": "UTMSCoordinateTransform"
+                },
+                {
+                    "className": "UTMMGRSCoordinateTransform"
+                }
+            ],
+            "after": [
+                {
+                    "className": "CountryCodeTransform",
+                    "args": []
+                }
+            ]
+        }
     ],
-    "references": {
-        "validators": [
-    
-        ],
-        "transforms": [
-    
-        ],
-        "conditions": [
-
-        ],
-        "maps": [
-
-        ],
-        "formatters": [
-
-        ],
-        "translators": [
-
-        ],
-        "actions": [
-
-        ],
-        "response": {
-
+    "mapStructure": {
+        "resourcegeographiclocation": {
+            "coordType": "",
+            "wkt": "",
+            "geojson": {
+                "type": "Feature",
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": []
+                },
+                "properties": {
+                    "countrycodes": [],
+                    "name": []
+                }
+            }
         }
     },
-    "strategy": [
-
+    "maps": [
+        {
+            "source": "Metadata.COORD_GEOJSON.geometry.coordinates",
+            "target": "resourcegeographiclocation.geojson.geometry.coordinates"
+        },
+        {
+            "source": "Metadata.COORD_WKT",
+            "target": "resourcegeographiclocation.wkt"
+        },
+        {
+            "source": "Metadata.COORD_TYPE",
+            "target": "resourcegeographiclocation.coordType"
+        },
+        {
+            "source": "Metadata.GENC_3",
+            "target": "resourcegeographiclocation.geojson.properties.countrycodes"
+        },
+        {
+            "source": "Metadata.GENC_NAMES",
+            "target": "resourcegeographiclocation.geojson.properties.name"
+        }
     ]
 }

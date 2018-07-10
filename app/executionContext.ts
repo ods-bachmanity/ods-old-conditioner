@@ -1,14 +1,16 @@
-import { DefinitionSchema, ConditionerResponseSchema, ComposerDefSchema } from './schemas'
+import { DefinitionSchema, ComposerDefSchema, FieldSchema, MapDefSchema } from './schemas'
 import { ComposerFactory, BaseComposer } from './composers'
-import { ErrorHandler } from '../common'
+import { ErrorHandler, Utilities } from '../common'
+import { TaskWorker } from './'
 
 import * as config from 'config'
 import * as _ from 'lodash'
+import { isNullOrUndefined } from 'util';
 
 export class ExecutionContext {
 
     public source: any = {}
-    public response = new ConditionerResponseSchema()
+    public transformed: any = {}
     public parameters: any = {}
 
     private _composerFactory = new ComposerFactory()
@@ -55,6 +57,7 @@ export class ExecutionContext {
                 }
                 const documents = await Promise.all(composers)
                 this.source = _.merge({}, ...documents)
+                this.transformed = _.cloneDeep(this.source)
                 return resolve(Object.assign({}, this.source))
             }
             catch (err) {
@@ -67,6 +70,85 @@ export class ExecutionContext {
         })
 
         return result
+    }
+
+    public schema(): Promise<any> {
+
+        const result = new Promise(async (resolve, reject) => {
+
+            try {
+                // EXECUTE DOCUMENT TRANFORMS
+                if (!this.definition.schema || this.definition.schema.length <= 0) return resolve(Object.assign({}, this.transformed))
+
+                const maxOrdinal = 10
+                let keepGoing = true
+                let currentOrdinal = 0
+
+                while (keepGoing && currentOrdinal <= maxOrdinal) {
+                    const tasks: Array<any> = []
+                    const fields = _.filter(this.definition.schema, {ordinal: currentOrdinal})
+                    if (!fields) {
+                        currentOrdinal = maxOrdinal + 1
+                        keepGoing = false
+                    }
+                    fields.forEach((field: FieldSchema) => {
+                        const taskWorker = new TaskWorker(this, field)
+                        tasks.push(taskWorker.execute())
+                    })
+                    const response = await Promise.all(tasks)
+                    this.transformed = _.merge(this.transformed, ...response)
+                    currentOrdinal++
+                }
+                return resolve(Object.assign({}, this.transformed))
+            }
+            catch (err) {
+                console.error(`ExecutionContext.schema().error:`)
+                console.error(`${JSON.stringify(err, null, 2)}`)
+                const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.schema().error`,
+                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
+                return reject(errorSchema)
+            }
+        })
+
+        return result
+    }
+
+    public map(): Promise<any> {
+
+        const result = new Promise((resolve, reject) => {
+
+            try {
+
+                const mapObject = Object.assign({}, this.definition.mapStructure || {})
+
+                const maps = this.definition.maps
+                if (maps && maps.length > 0) {
+
+                    maps.forEach((map: MapDefSchema) => {
+
+                        const value = Utilities.readValue(map.source, this.transformed)
+                        if (!isNullOrUndefined(value)) {
+                            Utilities.writeValue(map.target, value, mapObject)
+                        }
+                    })
+
+                }
+
+                return resolve(Object.assign({}, mapObject))
+
+            }
+            catch (err) {
+                console.error(`ExecutionContext.map().error:`)
+                console.error(`${JSON.stringify(err, null, 2)}`)
+                const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.map().error`,
+                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
+                return reject(errorSchema)
+            }
+
+        })
+
+        return result
+
     }
 
     private _internalAddParameter(key: string, value: string, req: any): string|any {

@@ -14,6 +14,11 @@ export class ConditionerService {
             try {
 
                 response.source = await executionContext.compose()
+
+                response.transformed = await executionContext.schema()
+
+                response.map = await executionContext.map()
+                
                 return resolve(response)
 
             }

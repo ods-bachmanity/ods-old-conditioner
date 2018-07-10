@@ -3,4 +3,6 @@ export class ConditionerResponseSchema {
     public message: string = ''
     public data: any = {}
     public source?: any
+    public transformed?: any
+    public map?: any
 }

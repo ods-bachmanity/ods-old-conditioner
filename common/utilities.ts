@@ -52,4 +52,45 @@ export class Utilities {
 
     }
 
+    public static readValue(dottedPath: string, source: any): string|any {
+
+        if (dottedPath.indexOf('.') < 0) return source[dottedPath];
+        const paths = dottedPath.split('.');
+        let reader: any = source;
+        paths.forEach((element) => {
+            if (reader != null) reader = reader[element] || null;
+        })
+        return reader;
+
+    }
+
+    public static writeValue(dottedPath: string, value: any, source: any) {
+
+        if (dottedPath.indexOf('.') < 0) return source[dottedPath] = value;
+        const paths = dottedPath.split('.');
+        let reader: any = source;
+        paths.forEach((element, index) => {
+            if (index >= paths.length - 1) {
+                return reader[element] = value;
+            }
+            reader = reader[element];
+        })
+
+    }
+
+    public static removeElement(dottedPath: string, source: any) {
+        if (dottedPath.indexOf('.') < 0) {
+            const reader = source;
+            return delete reader[dottedPath];
+        }
+        const paths = dottedPath.split('.');
+        let reader: any = source;
+        paths.forEach((element, index) => {
+            if (index >= paths.length - 1) {
+                return delete reader[element];
+            }
+            reader = reader[element];
+        })
+        
+    }
 }
