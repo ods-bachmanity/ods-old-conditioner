@@ -83,9 +83,9 @@ export class ElasticSearchComposer extends BaseComposer {
             }
             catch (err) {
                 const error = ErrorHandler.errorResponse(`ElasticSearchComposer.fx()`, 
-                    500, err.message ? err.message : `Error`, err)
+                    500, err.message || err.error ? err.message || err.error : `Error`, err)
                 console.error(`ElasticSearchComposer.fx().error:`)
-                console.error(`${JSON.stringify(err, null, 2)}`)
+                console.error(`${JSON.stringify(err.message || err.error ? err.message || err.error : err, null, 2)}`)
                 return reject(error)
             }
         })

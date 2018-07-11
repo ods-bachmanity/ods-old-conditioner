@@ -14,14 +14,19 @@ export class ConditionerService {
             const activity = new ConditionerExecutionSchema()
             try {
 
+                console.log(`************* ConditionerService.compose ************* `)
                 activity.source = await executionContext.compose()
 
+                console.log(`************* ConditionerService.schema ************* `)
                 activity.transformed = await executionContext.schema()
 
+                console.log(`************* ConditionerService.map ************* `)
                 activity.map = await executionContext.map()
 
+                console.log(`************* ConditionerService.act ************* `)
                 activity.actions = await executionContext.act()
                 
+                console.log(`************* ConditionerService.respond ************* `)
                 return resolve(this.composeResponse(Object.assign({}, activity), Object.assign({}, executionContext)))
 
             }
@@ -52,6 +57,7 @@ export class ConditionerService {
         response.ods_errors = []
         response.ods_definition = executionContext.definition.id
         response.emc = activity.actions
+        // response.transformed = activity.transformed
         
         return response
 

@@ -24,6 +24,12 @@
     ],
     "schema": [
         {
+            "field": "Metadata.TESTCOMPOSER",
+            "ordinal": 0,
+            "required": true,
+            "whitelist": ["EXECUTED PROPERLY"]
+        },
+        {
             "field": "Metadata.NITF_FHDR",
             "ordinal": 0,
             "required": true,
@@ -69,7 +75,11 @@
             ],
             "transforms-sample": [
                 {
-                    "className": "DecimalDegreesCoordinateTransform"
+                    "className": "DateTransform",
+                    "args": [
+                        {"key": "formatFrom", "value":"MM/DD/YYYY"},
+                        {"key": "formatTo", "value": "DD-MON-YYYY"}
+                    ]
                 },
                 {
                     "className": "GeographicCoordinateTransform"

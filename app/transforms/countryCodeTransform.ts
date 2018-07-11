@@ -35,6 +35,7 @@ export class CountryCodeTransform extends BaseTransform {
                 this.executionContext.transformed.Metadata.GENC_3 = codes
                 this.executionContext.transformed.Metadata.GENC_NAMES = names
 
+                console.log(`************* CountryCodeTransform Responding ************* `)
                 return resolve(true)
             }
             catch (err) {
@@ -71,7 +72,7 @@ export class CountryCodeTransform extends BaseTransform {
             }
             catch (err) {
                 console.log('ERROR:countryCodeTransform.callService');
-                console.error(err);
+                console.error(err.error ? err.error : err);
                 return reject(false);
             }
             
