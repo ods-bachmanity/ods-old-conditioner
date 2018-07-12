@@ -34,7 +34,8 @@
         "override-settings": "",
         "override-config": "",
         "assets": [
-            "/public/**"
+            "/public/**",
+            "/app/definitions/**"
         ],
         "exclude": [    
         ]

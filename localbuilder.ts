@@ -52,14 +52,14 @@ class LocalBuilder {
 
         this.copyCoreFiles(this._cwd, this._targetDir)
 
-        // assets from localbuilder.config.json GLOB
-        this.copyAssets(this._cwd, this._targetDir)
-
         // remove any exclusions from target
         this.removeExclusions(this._cwd, this._targetDir)
 
         // run tsc and build javascript files
         this.runTSC(this._cwd).then(() => {
+            // assets from localbuilder.config.json GLOB
+            this.copyAssets(this._cwd, this._targetDir)
+
             this.removeExclusions(this._cwd, this._targetDir)
             this.shutdown()
         })
@@ -201,6 +201,7 @@ class LocalBuilder {
                 matches.forEach((path) => {
                     const stat = fs.lstatSync(path)
                     const targetPath = path.replace(source, target)
+                    console.log(info(`Copying asset ${path}`))
                     if (stat.isDirectory()) {
                         this.verifyTargetDirectory(targetPath)
                     }
