@@ -24,45 +24,49 @@ const error = chalk.bold.red
 const warning = chalk.yellow
 
 class LocalBuilder {
-    private _cwd: string
+    // private _cwd: string
     private _args: Array<string>
-    private _targetDir: string
+    // private _targetDir: string
     private _isProd: boolean = false;
     private _packageJson = null // Set in method preConditions
     private _activeConfig = null // Set in method preConditions
 
-    public build (args: any) {
+    public async build (args: any) {
         this._args = args
-        this._cwd = process.cwd()
-        console.log(info(`Beginning Local Builder process in ${this._cwd}`))
+        // this._cwd = process.cwd()
+        this._isProd = (this._args.indexOf('-prod') >= 0) ? true : false
+        
+        const sourceDirectory = process.cwd()
+        const targetDirectory = path.join(sourceDirectory, (this._isProd) ? '_bundle':'_build')
+
+        console.log(info(`Beginning Local Builder process in ${sourceDirectory}`))
         console.log(info(`Args are ${this._args}`))
         
-        this._isProd = (this._args.indexOf('-prod') >= 0) ? true : false
-        this._targetDir = path.join(this._cwd, (this._isProd) ? '_bundle': '_build')
-        console.log(info(`Target directory set to ${this._targetDir}`))
+        console.log(info(`Target directory set to ${targetDirectory}`))
 
-        if (!this.preConditions(this._cwd)) {
+        if (!this.preConditions(sourceDirectory)) {
             console.error(error(`Preconditions were not met. Unable to continue process...`))
             this.shutdown()
             return
         }
 
-        const endpoint = path.join(this._targetDir)
+        const endpoint = path.join(targetDirectory)
         this.verifyTargetDirectory(endpoint)
 
-        this.copyCoreFiles(this._cwd, this._targetDir)
+        this.copyCoreFiles(sourceDirectory, targetDirectory)
 
         // remove any exclusions from target
-        this.removeExclusions(this._cwd, this._targetDir)
+        this.removeExclusions(sourceDirectory, targetDirectory)
 
         // run tsc and build javascript files
-        this.runTSC(this._cwd).then(() => {
-            // assets from localbuilder.config.json GLOB
-            this.copyAssets(this._cwd, this._targetDir)
+        await this.runTSC(sourceDirectory, targetDirectory)
 
-            this.removeExclusions(this._cwd, this._targetDir)
-            this.shutdown()
-        })
+        // assets from localbuilder.config.json GLOB
+        this.copyAssets(sourceDirectory, targetDirectory)
+
+        this.removeExclusions(sourceDirectory, targetDirectory)
+        this.shutdown()
+        
     }
     
     private fileExists(filePath: string): boolean {
@@ -192,22 +196,23 @@ class LocalBuilder {
 
     private copyAssets(source, target) {
 
+        console.log(warning(`Copying assets from source ${source} to target ${target}`))
         const assets = this._activeConfig.assets
         if (!assets) return
 
         assets.forEach((asset) => {
             const matches = glob.sync(path.join(source, asset), {})
             if (matches) {
-                matches.forEach((path) => {
-                    const stat = fs.lstatSync(path)
-                    const targetPath = path.replace(source, target)
-                    console.log(info(`Copying asset ${path}`))
+                matches.forEach((filepath) => {
+                    const stat = fs.lstatSync(filepath)
+                    const restOfPath = filepath.substring(source.length)
+                    const targetPath = path.join(target, restOfPath) //filepath.replace(source, target, 'utf-8')
                     if (stat.isDirectory()) {
                         this.verifyTargetDirectory(targetPath)
                     }
                     if (stat.isFile()) {
-                        console.log(warning(`Copying file to: ${targetPath}`))
-                        fs.copyFileSync(path, targetPath)
+                        console.log(warning(`Copying file from ${filepath} to: ${targetPath}`))
+                        fs.copyFileSync(filepath, targetPath)
                     }
                 })
             }
@@ -239,13 +244,13 @@ class LocalBuilder {
 
     }
 
-    private runTSC(cwd): Promise<number> {
+    private runTSC(cwd, targetDirectory): Promise<number> {
 
         const result = new Promise<number>((resolve, reject) => {
 
             const args = [
                 '-outDir',
-                this._targetDir,
+                targetDirectory,
                 '-p',
                 path.join(__dirname, 'tsconfig.json')
             ]

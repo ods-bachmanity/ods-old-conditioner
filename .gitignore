@@ -64,3 +64,4 @@ _bundle/
 .env
 
 validation-service/validators/
+package-lock.json
