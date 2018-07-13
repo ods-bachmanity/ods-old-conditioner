@@ -10,7 +10,7 @@ import { ActionFactory } from './actions';
 
 export class ExecutionContext {
 
-    public source: any = {}
+    public raw: any = {}
     public transformed: any = {}
     public parameters: any = {}
     public mapped: any = {}
@@ -59,9 +59,9 @@ export class ExecutionContext {
                     return
                 }
                 const documents = await Promise.all(composers)
-                this.source = _.merge({}, ...documents)
-                this.transformed = _.cloneDeep(this.source)
-                return resolve(Object.assign({}, this.source))
+                this.raw = _.merge({}, ...documents)
+                this.transformed = _.cloneDeep(this.raw)
+                return resolve(Object.assign({}, this.raw))
             }
             catch (err) {
                 console.error(`ExecutionContext.compose().error:`)

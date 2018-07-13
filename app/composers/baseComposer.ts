@@ -1,4 +1,5 @@
 import { DefinitionSchema, ComposerDefSchema, KeyValuePair, AuthenticationStrategies } from '../schemas'
+import { ExecutionContext } from '../'
 
 import * as _ from 'lodash'
 
@@ -7,7 +8,7 @@ export class BaseComposer {
     protected definition: DefinitionSchema
     protected authenticationStrategy: AuthenticationStrategies = AuthenticationStrategies.none
 
-    public constructor(protected executionContext: any, 
+    public constructor(protected executionContext: ExecutionContext, 
         protected composerDef: ComposerDefSchema) {
             this.definition = executionContext.definition
         
