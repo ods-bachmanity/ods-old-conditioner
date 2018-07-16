@@ -21,14 +21,12 @@ export class DefinitionService {
 
                 const isInMemoryObject = _.find(this._defs, {id: id})
                 if (isInMemoryObject) {
-                    console.log(`DefinitionService: Loaded definition from memory collection`)
                     return resolve(Object.assign({}, isInMemoryObject))
                 }
                 // __dirname is /app already
                 filePath = path.join(__dirname, 'definitions',id + '.json')
                 await fs.access(filePath, fs.constants.R_OK)
                 const def = await fs.readJson(filePath)
-                console.log(`DefinitionService: Loaded definition from file system`)
                 this._defs.push(def)
                 return resolve(def)
             }

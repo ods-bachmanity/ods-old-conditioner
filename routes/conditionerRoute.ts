@@ -28,8 +28,7 @@ export class ConditionerRoute {
                 res.header('Content-Type', 'application/json')
                 
                 const id = req.params.definitionId
-                console.log(`Conditioning fileuri for definition id ${id}`)
-
+                
                 // GET DEFINITION FOR EXECUTION
                 const definition = await this._definitionService.get(id)
                 if (!definition) {

@@ -61,7 +61,7 @@ export class Router {
 
         // Handle 404
         this.server.on('NotFound', (req, res, next) => {
-            console.log(`Router not found: ${req.url}`)
+            console.error(`Router not found: ${req.url}`)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             

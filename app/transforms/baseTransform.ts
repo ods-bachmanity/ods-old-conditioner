@@ -1,4 +1,4 @@
-import { DefinitionSchema, TransformDefSchema, Coordinate } from '../schemas'
+import { DefinitionSchema, TransformDefSchema, CoordinateSchema } from '../schemas'
 import { ExecutionContext } from '../'
 
 import * as _ from 'lodash'
@@ -16,17 +16,17 @@ export class BaseTransform {
     }
 
     public fx(): Promise<Boolean> {
-        console.log('Base Transform Ran')
+        console.info('Base Transform Ran')
         return Promise.resolve(true)
     }
 
-    protected toGeoJSON(input: Array<Coordinate>): any {
+    protected toGeoJSON(input: Array<CoordinateSchema>): any {
 
         if (!input || input.length <= 0) {
             return {};
         }
         const result: Array<Array<number>> = [];
-        input.forEach((item: Coordinate) => {
+        input.forEach((item: CoordinateSchema) => {
             const point = [];
             point.push(item.Longitude);
             point.push(item.Latitude);
@@ -34,7 +34,7 @@ export class BaseTransform {
             result.push(point);
         })
         // Push first point onto the end of the array to close GeoJSON polygon.
-        let item: Coordinate = input[0];
+        let item: CoordinateSchema = input[0];
         if (result.length < 5) {
             let point = [];
             point.push(item.Longitude);
@@ -57,13 +57,13 @@ export class BaseTransform {
 
     }
 
-    protected toWkt(input: Array<Coordinate>): string {
+    protected toWkt(input: Array<CoordinateSchema>): string {
 
         if (!input || input.length <= 0) {
             return '';
         }
         let output = 'POLYGON ((';
-        input.forEach((item: Coordinate) => {
+        input.forEach((item: CoordinateSchema) => {
             if (output.length > 10) {
                 output += ',';
             }

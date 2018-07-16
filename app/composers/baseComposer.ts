@@ -28,7 +28,7 @@ export class BaseComposer {
     }
 
     public fx(): Promise<any> {
-        console.log('BaseComposer Ran')
+        console.info('BaseComposer Ran')
         return Promise.resolve({})
     }
 

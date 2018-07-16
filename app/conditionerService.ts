@@ -14,20 +14,15 @@ export class ConditionerService {
             const activity = new ConditionerExecutionSchema()
             try {
 
-                console.log(`************* ConditionerService.compose ************* `)
-                activity.source = await executionContext.compose()
+                activity.raw = await executionContext.compose()
 
-                console.log(`************* ConditionerService.schema ************* `)
                 activity.transformed = await executionContext.schema()
 
-                console.log(`************* ConditionerService.map ************* `)
                 activity.map = await executionContext.map()
 
-                console.log(`************* ConditionerService.act ************* `)
                 activity.actions = await executionContext.act()
                 
-                console.log(`************* ConditionerService.respond ************* `)
-                return resolve(this.composeResponse(Object.assign({}, activity), Object.assign({}, executionContext)))
+                return resolve(Object.assign({}, this.composeResponse(activity, executionContext)))
 
             }
             catch (err) {
@@ -52,11 +47,11 @@ export class ConditionerService {
         response.fingerprint = activity.transformed.FingerPrint
         response.version = executionContext.parameters['version']
         response.contentId = activity.transformed.FingerPrint
-        response.data = activity.map
+        response.data = Object.assign({}, activity.map)
         response.ods_code = activity.code
         response.ods_errors = []
         response.ods_definition = executionContext.definition.id
-        response.emc = activity.actions
+        response.emc = Object.assign({}, activity.actions)
         // response.transformed = activity.transformed
         
         return response

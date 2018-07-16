@@ -20,6 +20,12 @@ export class ExecutionContext {
 
     public constructor(public definition: DefinitionSchema) {}
 
+    public getParameter(key: string): any {
+
+        const result = this.parameters[key]
+        return result
+        
+    }
     public addParameter(key: string, value: string, req?: any) {
 
         if (value.indexOf('||') >= 0) {
@@ -31,14 +37,14 @@ export class ExecutionContext {
                     const result = this._internalAddParameter(key, value, req)
                     if (result) {
                         isValueSet = true
-                        console.log(`Setting ${key} to ${result}`)
+                        // console.log(`Setting ${key} to ${result}`)
                     }
                 }
             })
             return
         }
         const result = this._internalAddParameter(key, value, req)
-        console.log(`Setting ${key} to ${result}`)
+        // console.log(`Setting ${key} to ${result}`)
     }
 
     public compose(): Promise<any> {
@@ -93,14 +99,15 @@ export class ExecutionContext {
                     if (!fields) {
                         currentOrdinal = maxOrdinal + 1
                         keepGoing = false
+                    } else {
+                        fields.forEach((field: FieldSchema) => {
+                            const taskWorker = new TaskWorker(this, field)
+                            tasks.push(taskWorker.execute())
+                        })
+                        const response = await Promise.all(tasks)
+                        this.transformed = _.merge(this.transformed, ...response)
+                        currentOrdinal++    
                     }
-                    fields.forEach((field: FieldSchema) => {
-                        const taskWorker = new TaskWorker(this, field)
-                        tasks.push(taskWorker.execute())
-                    })
-                    const response = await Promise.all(tasks)
-                    this.transformed = _.merge(this.transformed, ...response)
-                    currentOrdinal++
                 }
                 return resolve(Object.assign({}, this.transformed))
             }
@@ -169,7 +176,7 @@ export class ExecutionContext {
                         tasks.push(action.fx())
                     })
                     const response = await Promise.all(tasks)
-                    return resolve(response)
+                    return resolve(Object.assign({}, response))
                 } else {
                     return resolve()
                 }

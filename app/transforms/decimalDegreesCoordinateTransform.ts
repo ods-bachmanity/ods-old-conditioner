@@ -1,11 +1,11 @@
 import { BaseTransform } from './'
-import { Coordinate } from '../schemas'
+import { CoordinateSchema } from '../schemas'
 
 export class DecimalDegreesCoordinateTransform extends BaseTransform {
 
     public fx(): Promise<Boolean> {
 
-        console.log('I am transforming Decimal Degree coordinates.')
+        // console.log('I am transforming Decimal Degree coordinates.')
 
         const result: Promise<boolean> = new Promise((resolve, reject) => {
 
@@ -27,7 +27,7 @@ export class DecimalDegreesCoordinateTransform extends BaseTransform {
                     const LON_LENGTH: number = 8
                     const COORD_LENGTH: number  = 15
     
-                    const arrCoords: Array<Coordinate> = []
+                    const arrCoords: Array<CoordinateSchema> = []
     
                     for( var i = 0; i <= 3; i++ )
                     {   // grab first 15 byte chunk
@@ -74,17 +74,17 @@ export class DecimalDegreesCoordinateTransform extends BaseTransform {
                     }
     
                     // # Create GeoJSON and wkt from parsed NITF_IGEOLO field.
-                    if (arrCoords.length >0) {
-                        this.executionContext.transformed.Metadata.COORD_GEOJSON = super.toGeoJSON(arrCoords || []);
-                        this.executionContext.transformed.Metadata.COORD_WKT = super.toWkt(arrCoords || []);
-                        this.executionContext.transformed.Metadata.COORD_TYPE = 'D';
+                    if (arrCoords.length > 0) {
+                        this.executionContext.transformed.Metadata.COORD_GEOJSON = super.toGeoJSON(arrCoords || [])
+                        this.executionContext.transformed.Metadata.COORD_WKT = super.toWkt(arrCoords || [])
+                        this.executionContext.transformed.Metadata.COORD_TYPE = 'D'
+                        return resolve(true)
                     }
     
-                    return resolve(true);
-                } else {
-                    return resolve(false)
                 }
-    
+
+                return reject(false)
+
             }
             catch (err) {
                 console.error(`Error in DecimalDegreesCoordinateTransform.fx(): ${JSON.stringify(err, null, 2)}`)
@@ -93,7 +93,7 @@ export class DecimalDegreesCoordinateTransform extends BaseTransform {
 
         })
 
-        return result;
+        return result
 
     }
 

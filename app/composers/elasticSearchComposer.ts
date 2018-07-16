@@ -20,7 +20,6 @@ export class ElasticSearchComposer extends BaseComposer {
                         url = url.replace(`://`, `://${uname}:${pw}@`)
                     }
                 }
-                // console.log(`ElasticSearchComposer.fx(): Calling ${url}`)
                 const payload: any = {
                     q: `fingerprint:${this.executionContext.parameters.fingerprint}`,
                     _source_includes: 'rawheader'
@@ -39,14 +38,13 @@ export class ElasticSearchComposer extends BaseComposer {
                     }
                 }
 
-                // console.log(JSON.stringify(this.executionContext, null, 2))
                 if (!this.executionContext || !this.executionContext.parameters || !this.executionContext.parameters.fileuri) {
                     const error = ErrorHandler.errorResponse(`ElasticSearchComposer.fx().try`,
                     400, 'Missing fileuri in Request body', null)
                     return reject(error)
                 }
                 
-                console.log(`Calling ${JSON.stringify(endpoint, null, 2)}`)
+                // console.info(`Calling ${JSON.stringify(endpoint, null, 2)}`)
                 const response = await rp(endpoint)
                 const body = JSON.parse(response)
 
@@ -77,8 +75,7 @@ export class ElasticSearchComposer extends BaseComposer {
                 }
 
                 const fileObject = JSON.parse(body.hits.hits[0]._source.rawheader)
-                // console.log(`elasticSearchComposer.fx: JSON response from metadataservice is ${JSON.stringify(fileObject, null, 2)}`)                
-
+                
                 return resolve(fileObject)
             }
             catch (err) {

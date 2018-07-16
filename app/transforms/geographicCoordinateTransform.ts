@@ -1,5 +1,5 @@
 import { ExecutionContext } from '../'
-import { TransformDefSchema, CoordinateConversionRequestSchema } from '../schemas'
+import { TransformDefSchema } from '../schemas'
 import { BaseTransform } from './baseTransform';
 
 const rp = require('request-promise')
@@ -14,11 +14,12 @@ export class GeographicCoordinateTransform extends BaseTransform {
 
     public fx(): Promise<Boolean> {
 
-        console.log(`Geographic Transform running for ${this.fieldName}`)
+        // console.log(`Geographic Transform running for ${this.fieldName}`)
 
         const result: Promise<boolean> = new Promise(async (resolve, reject) => {
 
             try {
+                
                 if (this.executionContext.transformed.Metadata.COORD_GEOJSON) return resolve(true)
 
                 // # Gather IGEOLO
@@ -35,9 +36,9 @@ export class GeographicCoordinateTransform extends BaseTransform {
                     const LON_LENGTH: number = 8
                     const COORD_LENGTH: number  = 15
     
-                    const myNewInstance = new CoordinateConversionRequestSchema()
+                    const myNewInstance = new CoordinateConversionRequest()
     
-                    for( var i = 0; i <= 3; i++ )
+                    for ( var i = 0; i <= 3; i++ )
                     {   // grab first 15 byte chunk
                         var coordinate = nitfIGEOLO.substr(i*COORD_LENGTH, COORD_LENGTH)
                         // grab raw lat
@@ -63,20 +64,16 @@ export class GeographicCoordinateTransform extends BaseTransform {
                         this.executionContext.transformed.Metadata.COORD_GEOJSON = super.toGeoJSON(body.Coordinates || [])
                         this.executionContext.transformed.Metadata.COORD_WKT = super.toWkt(body.Coordinates || [])
                         this.executionContext.transformed.Metadata.COORD_TYPE = 'G'
-                        console.log(`Geographic Coordinate Transform WKT: ${this.executionContext.transformed.Metadata.COORD_WKT}`)
+                        return resolve(true)
                     }
-                    return resolve(true)
                 
-                } else {
-
-                    return reject(false)
-
                 }
+
+                return reject(false)
     
             }
             catch (err) {
-                console.log(`ERROR:geographic_coordinateTransform.fx:${err}`)
-                // this.te.errors.push('ERROR:geographic_coordinateTransform.fx:' + err);
+                console.error(`ERROR:geographic_coordinateTransform.fx:${err}`)
                 return reject(false)
             }
 
@@ -86,7 +83,7 @@ export class GeographicCoordinateTransform extends BaseTransform {
 
     }
 
-    private callService(conversionRequest: CoordinateConversionRequestSchema): Promise<any> {
+    private callService(conversionRequest: CoordinateConversionRequest): Promise<any> {
 
         const result = new Promise(async (resolve, reject) => {
 
@@ -106,9 +103,9 @@ export class GeographicCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.log('ERROR:geographicCoordinateTransform.callService');
-                console.error(err);
-                return reject(null);
+                console.error('ERROR:geographicCoordinateTransform.callService')
+                console.error(err)
+                return reject(null)
             }
             
         })
@@ -117,4 +114,25 @@ export class GeographicCoordinateTransform extends BaseTransform {
 
     }
 
+}
+
+class CoordinateConversionRequest {
+    lonRange: number = 0
+    leadingZeros: boolean = false
+    signHemisphere: number = 0
+    geodeiticUnits: number = 2
+    sourceDatum: string = 'WGE'
+    sourceCoordinateType: number = 10
+    sourceHeightType: number = 0
+    targetDatum: string = 'WGE'
+    targetCoordinateType: number = 10
+    targetHeightType: number = 0
+    targetZone: boolean = false
+    sourceCoordinates: Array<SourceCoordinate> = []
+}
+
+class SourceCoordinate {
+    sourceLongitude: string = ''
+    sourceLatitude: string = ''
+    sourceHeight: string = '0'
 }

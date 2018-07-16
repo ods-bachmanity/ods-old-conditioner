@@ -42,6 +42,7 @@ export class BulkConditionerRoute {
                 }
 
                 const workItems = []
+                const responses = []
                 req.body.files.forEach((item) => {
                     // CREATE EXECUTION CONTEXT
                     const executionContext = new ExecutionContext(definition)
@@ -53,12 +54,19 @@ export class BulkConditionerRoute {
                     }
                     const conditionerService = new ConditionerService()
 
-                    workItems.push(conditionerService.execute(executionContext))
+                    workItems.push(conditionerService.execute(executionContext).then((item) => {
+                        // Need a complete recreation of reference item so Array memory does not send shared results
+                        const newItem = JSON.parse(JSON.stringify(item))
+                        responses.push(newItem)
+                        return newItem
+                    }))
                 })
-                const result: Array<ConditionerResponseSchema> = await Promise.all(workItems)
-                res.send(200, result)
-            
+
+                await Promise.all(workItems)
+
+                res.send(200, responses)
                 return next()
+        
             }
             catch (err) {
                 console.error(`BulkConditionerRoute.init.post(${path}).error: ${JSON.stringify(err, null, 2)}`)

@@ -19,8 +19,7 @@ export class CountryCodeTransform extends BaseTransform {
             try {
 
                 const footprint = this.executionContext.transformed.Metadata.COORD_WKT
-                console.log(`County Code service searching for WKT ${footprint}`)
-    
+                
                 if (!footprint) return resolve(false)
     
                 const response = await this.callService(footprint)
@@ -35,7 +34,6 @@ export class CountryCodeTransform extends BaseTransform {
                 this.executionContext.transformed.Metadata.GENC_3 = codes
                 this.executionContext.transformed.Metadata.GENC_NAMES = names
 
-                console.log(`************* CountryCodeTransform Responding ************* `)
                 return resolve(true)
             }
             catch (err) {
@@ -71,7 +69,7 @@ export class CountryCodeTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.log('ERROR:countryCodeTransform.callService');
+                console.error('ERROR:countryCodeTransform.callService');
                 console.error(err.error ? err.error : err);
                 return reject(false);
             }

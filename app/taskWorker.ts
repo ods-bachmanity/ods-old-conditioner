@@ -21,7 +21,6 @@ export class TaskWorker {
 
                 // TEST IF REQUIRED EXISTS AND HAS VALUE
                 const fieldValue = Utilities.readValue(this.fieldSchema.field, this.executionContext.transformed)
-                console.log(`Running task worker for field ${this.fieldSchema.field}: ${fieldValue}`)
                 if (this.fieldSchema.required) {
                     const nullOrEmpty = isNullOrUndefined(fieldValue)
                     if (nullOrEmpty) {

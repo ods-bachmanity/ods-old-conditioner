@@ -24,7 +24,6 @@ export class DefinitionRoute {
                 res.header('Content-Type', 'application/json')
                 
                 const id = req.params.id
-                console.log(`Searching for definition id ${id}`)
                 const result = await this._definitionService.get(id)
                 res.send(200, result)
             
