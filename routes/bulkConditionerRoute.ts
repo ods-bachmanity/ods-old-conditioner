@@ -1,83 +1,101 @@
-import { ConditionerService } from '../app'
 import { ConditionerResponseSchema } from '../app/schemas'
-import { ExecutionContext } from '../app/executionContext';
-import { DefinitionService } from '../app/definitionService';
+import { DefinitionService, ConditionerService, ExecutionContext } from '../app/';
 
+const RunQueue = require('run-queue')
+ 
 import * as _ from 'lodash'
 
 export class BulkConditionerRoute {
     
-    private _definitionService = new DefinitionService()
-
-    public constructor (private server: any) {
-
-    }
+    public constructor (private server: any) {}
 
     public init (path: string) {
 
         this.server.post(path, async (req, res, next) => {
 
             try {
-                if (!req.params || !req.params.definitionId || !req.body.files) {
-                    res.contentType = 'application/json'
-                    res.header('Content-Type', 'application/json')
+                res.contentType = 'application/json'
+                res.header('Content-Type', 'application/json')
+    
+                if (!req.params || !req.params.definitionId) {
                     
                     res.send(400, 'Bad Request')
                     return next()
-                }
-                res.contentType = 'application/json'
-                res.header('Content-Type', 'application/json')
-                
-                const id = req.params.definitionId
-                
-                // GET DEFINITION FOR EXECUTION
-                const definition = await this._definitionService.get(id)
-                if (!definition) {
-                    throw new Error(`Invalid Definition Id`)
+
                 }
 
                 if (!req.body.files || req.body.files.length <= 0) {
+
                     res.send(400, {code: -1, message: 'Invalid Request Body. Missing files item.'})
                     return next()
+
                 }
 
-                const workItems = []
+                const definitionId = req.params.definitionId
+                
+                const workitems = []
                 const responses = []
                 req.body.files.forEach((item) => {
-                    // CREATE EXECUTION CONTEXT
-                    const executionContext = new ExecutionContext(definition)
-                    if (definition.parameters) {
-                        const mockRequestBody = { body: item }
-                        definition.parameters.forEach((item) => {
-                            executionContext.addParameter(item.key, item.value, mockRequestBody)
-                        })
-                    }
-                    const conditionerService = new ConditionerService()
-
-                    workItems.push(conditionerService.execute(executionContext).then((item) => {
-                        // Need a complete recreation of reference item so Array memory does not send shared results
-                        const newItem = JSON.parse(JSON.stringify(item))
-                        responses.push(newItem)
-                        return newItem
+                    const mockRequestBody = { body: item }
+                    workitems.push(this.executeRoute(definitionId, mockRequestBody).then((workItemResponse) => {
+                        responses.push(Object.assign({}, workItemResponse))
                     }))
                 })
 
-                await Promise.all(workItems)
+                const records = await Promise.all(workitems)
+                const response = []
+                responses.forEach((conditionedItem) => {
+                    const output = {
+                        contentId: conditionedItem.contentId,
+                        fileUri: conditionedItem.fileUri,
+                        fingerprint: conditionedItem.fingerprint,
+                        version:  conditionedItem.version,
+                        data: Object.assign({}, conditionedItem.data),
+                        ods_code: conditionedItem.ods_code,
+                        ods_errors: conditionedItem.ods_errors,
+                        ods_definition: conditionedItem.ods_definition,
+                        emc: conditionedItem.emc
+                    }
+                    response.push(output)
+                })
 
-                res.send(200, responses)
+                res.end(JSON.stringify(response))
                 return next()
         
             }
             catch (err) {
-                console.error(`BulkConditionerRoute.init.post(${path}).error: ${JSON.stringify(err, null, 2)}`)
-                res.contentType = 'application/json'
-                res.header('Content-Type', 'application/json')
+                console.error(`BulkConditionerRoute.init.post(${path}).error: ${err}`)
                 
                 res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()
             }
 
         })
+
+    }
+
+    private executeRoute(definitionId: string, requestContext: any): Promise<any> {
+
+        const result = new Promise(async (resolve, reject) => {
+
+            try {
+
+                // console.log(`Executing request ${JSON.stringify(requestContext.body,null,2)}`)
+                const conditionerService = new ConditionerService()
+                
+                const records: ConditionerResponseSchema = await conditionerService.execute(definitionId, requestContext)
+    
+                return resolve(records)
+    
+            }
+            catch (err) {
+                console.error(`bulkConditionerRoute.executeRoute.error: ${err}`)
+                return reject(err)
+            }
+
+        })
+
+        return result
 
     }
 

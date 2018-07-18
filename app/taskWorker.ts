@@ -8,6 +8,7 @@ import * as _ from 'lodash'
 
 export class TaskWorker {
 
+    private _utilities = new Utilities()
     private _transformFactory = new TransformFactory()
 
     public constructor(private executionContext: ExecutionContext, private fieldSchema: FieldSchema) {}
@@ -20,7 +21,7 @@ export class TaskWorker {
                 if (!this.fieldSchema) return resolve({})
 
                 // TEST IF REQUIRED EXISTS AND HAS VALUE
-                const fieldValue = Utilities.readValue(this.fieldSchema.field, this.executionContext.transformed)
+                const fieldValue = this._utilities.readValue(this.fieldSchema.field, this.executionContext.transformed)
                 if (this.fieldSchema.required) {
                     const nullOrEmpty = isNullOrUndefined(fieldValue)
                     if (nullOrEmpty) {

@@ -16,19 +16,9 @@
             "args": [
                 {"key": "auth", "value": "basic"}
             ]
-        },
-        {
-            "className": "TestComposer",
-            "args": []
         }
     ],
     "schema": [
-        {
-            "field": "Metadata.TESTCOMPOSER",
-            "ordinal": 0,
-            "required": true,
-            "whitelist": ["EXECUTED PROPERLY"]
-        },
         {
             "field": "Metadata.NITF_FHDR",
             "ordinal": 0,
@@ -43,9 +33,7 @@
             "whitelist": [
                 "D","G","N","S","U"
             ],
-            "blacklist": [
-                "WILLNOTFAIL"
-            ],
+            "blacklist": [],
             "case": [
                 {
                     "match": "D",

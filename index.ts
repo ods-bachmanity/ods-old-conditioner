@@ -3,7 +3,9 @@ import * as config from 'config'
 import { Utilities, RouteServer, ErrorHandler } from './common'
 import { Router } from './routes/router'
 
-if (!Utilities.preconditionCheck()) {
+const _utilities = new Utilities()
+
+if (!_utilities.preconditionCheck()) {
     console.error('One or more preconditions for startup were not met. Check log for details. Process terminated')
     process.exit(1)
 }

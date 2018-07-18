@@ -2,6 +2,7 @@ import { BaseAction } from './'
 import { AuthenticationStrategies } from '../schemas'
 
 const rp = require('request-promise')
+import * as _ from 'lodash'
 
 export class ElasticUpdateAction extends BaseAction {
 
@@ -21,9 +22,13 @@ export class ElasticUpdateAction extends BaseAction {
                 timestamp: `${timestamp}`,
                 status: true
             }
-    
+            return resolve({})
+            
             try {
+
+                // Mocks called locally to emulate calling Elastic
                 // http://localhost:8081/emc/logs/${fingerprint}/_update
+
                 let url = this.executionContext.parameters.catalog_endpoint_update
                 if (this.authenticationStrategy === AuthenticationStrategies.basic) {
                     const uname = this.executionContext.parameters.username
@@ -39,7 +44,7 @@ export class ElasticUpdateAction extends BaseAction {
                     url: url,
                     simple: false,
                     body: JSON.stringify({
-                        doc: this.executionContext.mapped
+                        doc: _.cloneDeep(this.executionContext.mapped)
                     })
                 })
                 
@@ -47,6 +52,7 @@ export class ElasticUpdateAction extends BaseAction {
                 
             }
             catch (err) {
+                console.error(`ElasticUpdateAction.fx.error: ${err}`)
                 this.executionContext.mapped.ods.conditioners[this.executionContext.definition.id] = {
                     version: '0.0.1',
                     timestamp: `${timestamp}`,
@@ -55,7 +61,7 @@ export class ElasticUpdateAction extends BaseAction {
                 }
                 return reject(err)
             }
-
+            
         })
 
         return result

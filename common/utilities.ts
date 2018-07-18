@@ -15,7 +15,7 @@ export class Utilities {
 
     }
 
-    public static preconditionCheck(): Boolean {
+    public preconditionCheck(): Boolean {
         
         let allGood = true
         if (!Utilities.fileExists(path.join(process.cwd(), '.env'))) {
@@ -34,7 +34,7 @@ export class Utilities {
         
     }
 
-    public static environmentVariables(obfuscate: Array<string>, remove: Array<string>): any {
+    public environmentVariables(obfuscate: Array<string>, remove: Array<string>): any {
 
         const env = process.env
         const result = {}
@@ -52,7 +52,7 @@ export class Utilities {
 
     }
 
-    public static readValue(dottedPath: string, source: any): string|any {
+    public readValue(dottedPath: string, source: any): string|any {
 
         if (dottedPath.indexOf('.') < 0) return source[dottedPath];
         const paths = dottedPath.split('.');
@@ -64,7 +64,7 @@ export class Utilities {
 
     }
 
-    public static writeValue(dottedPath: string, value: any, source: any) {
+    public writeValue(dottedPath: string, value: any, source: any) {
 
         if (dottedPath.indexOf('.') < 0) return source[dottedPath] = value;
         const paths = dottedPath.split('.');
@@ -78,7 +78,7 @@ export class Utilities {
 
     }
 
-    public static removeElement(dottedPath: string, source: any) {
+    public removeElement(dottedPath: string, source: any) {
         if (dottedPath.indexOf('.') < 0) {
             const reader = source;
             return delete reader[dottedPath];

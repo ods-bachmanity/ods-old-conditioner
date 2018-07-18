@@ -1,18 +1,27 @@
 import { ErrorHandler } from '../common'
 import { ConditionerResponseSchema, ConditionerExecutionSchema } from './schemas'
 import { ExecutionContext } from './executionContext';
-import { exec } from 'child_process';
 
 export class ConditionerService {
     
     constructor() {}
 
-    public execute(executionContext: ExecutionContext): Promise<ConditionerResponseSchema> {
+    public execute(definitionId: string, requestContext: any): Promise<ConditionerResponseSchema> {
 
         const result: Promise<ConditionerResponseSchema> = new Promise(async (resolve, reject) => {
 
-            const activity = new ConditionerExecutionSchema()
             try {
+
+                const executionContext: ExecutionContext = new ExecutionContext(definitionId)
+                const definition = await executionContext.initialize()
+    
+                if (definition.parameters) {
+                    definition.parameters.forEach((item) => {
+                        executionContext.addParameter(item.key, item.value, requestContext)
+                    })
+                }
+    
+                const activity = new ConditionerExecutionSchema()
 
                 activity.raw = await executionContext.compose()
 
@@ -22,13 +31,14 @@ export class ConditionerService {
 
                 activity.actions = await executionContext.act()
                 
-                return resolve(Object.assign({}, this.composeResponse(activity, executionContext)))
+                const response = await executionContext.respond()
+
+                return resolve(response)
 
             }
             catch (err) {
-                console.error(`ConditionerService.execute(${executionContext.definition.id}).error:`)
-                console.error(`${JSON.stringify(err, null, 2)}`)
-                const errorSchema = ErrorHandler.errorResponse(`ConditionerService.execute(${executionContext.definition.id})`,
+                console.error(`ConditionerService.execute(${definitionId}).error: ${err}`)
+                const errorSchema = ErrorHandler.errorResponse(`ConditionerService.execute(${definitionId})`,
                     err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ConditionerService`), err)
                 return reject(errorSchema)
             }
@@ -36,25 +46,6 @@ export class ConditionerService {
         })
 
         return result
-
-    }
-
-    private composeResponse(activity: ConditionerExecutionSchema, executionContext: ExecutionContext): ConditionerResponseSchema {
-
-        const response = new ConditionerResponseSchema()
-
-        response.fileUri = activity.transformed.FileUri
-        response.fingerprint = activity.transformed.FingerPrint
-        response.version = executionContext.parameters['version']
-        response.contentId = activity.transformed.FingerPrint
-        response.data = Object.assign({}, activity.map)
-        response.ods_code = activity.code
-        response.ods_errors = []
-        response.ods_definition = executionContext.definition.id
-        response.emc = Object.assign({}, activity.actions)
-        // response.transformed = activity.transformed
-        
-        return response
 
     }
 

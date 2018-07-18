@@ -1,16 +1,10 @@
-import { ConditionerService } from '../app'
 import { ConditionerResponseSchema } from '../app/schemas'
 import { ExecutionContext } from '../app/executionContext';
-import { DefinitionService } from '../app/definitionService';
+import { DefinitionService, ConditionerService } from '../app/';
 
 export class ConditionerRoute {
     
-    private _conditionerService = new ConditionerService()
-    private _definitionService = new DefinitionService()
-
-    public constructor (private server: any) {
-
-    }
+    public constructor (private server: any) {}
 
     public init (path: string) {
 
@@ -24,32 +18,19 @@ export class ConditionerRoute {
                     res.send(400, 'Bad Request')
                     return next()
                 }
+                const definitionId = req.params.definitionId
+                const result = await this.executeRoute(definitionId, req)
+
                 res.contentType = 'application/json'
                 res.header('Content-Type', 'application/json')
                 
-                const id = req.params.definitionId
-                
-                // GET DEFINITION FOR EXECUTION
-                const definition = await this._definitionService.get(id)
-                if (!definition) {
-                    throw new Error(`Invalid Definition Id`)
-                }
-
-                // CREATE EXECUTION CONTEXT
-                const executionContext = new ExecutionContext(definition)
-                if (definition.parameters) {
-                    definition.parameters.forEach((item) => {
-                        executionContext.addParameter(item.key, item.value, req)
-                    })
-                }
-                
-                const result: ConditionerResponseSchema = await this._conditionerService.execute(executionContext)
                 res.send(200, result)
             
                 return next()
             }
             catch (err) {
-                console.error(`ConditionerRoute.init.post(${path}).error: ${JSON.stringify(err, null, 2)}`)
+                console.error(`ConditionerRoute.init.post(${path}).error: ${err}`)
+
                 res.contentType = 'application/json'
                 res.header('Content-Type', 'application/json')
                 
@@ -58,6 +39,30 @@ export class ConditionerRoute {
             }
 
         })
+
+    }
+
+    public async executeRoute(definitionId: string, requestContext: any): Promise<any> {
+
+        const result = new Promise(async (resolve, reject) => {
+
+            try {
+    
+                const conditionerService = new ConditionerService()
+                
+                const records: ConditionerResponseSchema = await conditionerService.execute(definitionId, requestContext)
+    
+                return resolve(records)
+    
+            }
+            catch (err) {
+                console.error(`conditionerRoute.executeRoute.error: ${err}`)
+                return reject(err)
+            }
+
+        })
+
+        return result
 
     }
 
