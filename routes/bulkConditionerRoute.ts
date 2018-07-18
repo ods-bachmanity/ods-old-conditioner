@@ -1,10 +1,6 @@
 import { ConditionerResponseSchema } from '../app/schemas'
 import { DefinitionService, ConditionerService, ExecutionContext } from '../app/';
 
-const RunQueue = require('run-queue')
- 
-import * as _ from 'lodash'
-
 export class BulkConditionerRoute {
     
     public constructor (private server: any) {}
