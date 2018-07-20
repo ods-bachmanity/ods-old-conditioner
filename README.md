@@ -1,6 +1,10 @@
 # ODS Conditioner (Work Engine)
 Compose, Validate, Transform, Act and Respond on Imagery metadata for ODS Metadata Catalog
 
+## note
+The `./app` directory is NOT used for development. It is created as a part of the deployment process. It will contain latest compiled JavaScript files created when the 
+script `npm run bundle` is executed. Please do not make changes and check into source control in this folder as they will not be merged into `master`
+
 ## latest
 - **Testing**: Support for Mocha/Chai Unit Tests compiled alongside core code. Execution of tests as part of local development or as part of a development build. Tests can be built and executed using TypeScript (strongly typed JavaScript).
 - **Deployment (Test)**: `npm run build` creates a local `./_build` directory with code ready for deployment into a testing environment. Code is optimized to support execution of Unit Tests.
