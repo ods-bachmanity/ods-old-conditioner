@@ -68,7 +68,7 @@
             "/.gitignore",
             "/swagger.json",
             "/test",
-            "/sample-test.ts"
+            "/sample-test.js"
         ]
     },
     "dev": {

@@ -37,7 +37,7 @@ class LocalBuilder {
         this._isProd = (this._args.indexOf('-prod') >= 0) ? true : false
         
         const sourceDirectory = process.cwd()
-        const targetDirectory = path.join(sourceDirectory, (this._isProd) ? '_bundle':'_build')
+        const targetDirectory = path.join(sourceDirectory, (this._isProd) ? 'app':'_build')
 
         console.log(info(`Beginning Local Builder process in ${sourceDirectory}`))
         console.log(info(`Args are ${this._args}`))

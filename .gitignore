@@ -62,6 +62,7 @@ typings/
 _build/
 _bundle/
 _docker/
+app/
 .env
 
 validation-service/validators/
