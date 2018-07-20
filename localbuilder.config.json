@@ -68,7 +68,8 @@
             "/.gitignore",
             "/swagger.json",
             "/test",
-            "/sample-test.js"
+            "/sample-test.js",
+            "/.env"
         ]
     },
     "dev": {
