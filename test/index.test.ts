@@ -1,5 +1,5 @@
 import * as chai from 'chai'
-import { DefinitionService } from '../app';
+import { DefinitionService } from '../src';
 import { AssertionError } from 'assert';
 import { isNullOrUndefined } from 'util';
 const should = chai.should()

@@ -61,6 +61,7 @@ typings/
 .vscode/
 _build/
 _bundle/
+_docker/
 .env
 
 validation-service/validators/

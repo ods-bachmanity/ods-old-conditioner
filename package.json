@@ -1,7 +1,7 @@
 {
-  "name": "working-engine",
-  "version": "1.0.0",
-  "description": "Transform and Map metadata from any service to any service",
+  "name": "ods-conditioner",
+  "version": "0.1.0",
+  "description": "Transform and Map metadata from and back to Elastic Search",
   "main": "index.js",
   "scripts": {
     "start": "nodemon -r ts-node/register index.ts",
@@ -9,7 +9,8 @@
     "build": "node -r ts-node/register localbuilder.ts -dev",
     "bundle": "node -r ts-node/register localbuilder.ts -prod"
   },
-  "author": "Steven Sederburg <stevenscloud@live.com>",
+  "repository": "https://github.com/thepepto/ods-conditioner.git",
+  "author": "Steven Sederburg <stevens@blackspoke.com>",
   "license": "ISC",
   "dependencies": {
     "config": "^1.30.0",
@@ -18,6 +19,7 @@
     "lodash": "^4.17.10",
     "node-gyp": "^3.7.0",
     "nodemon": "^1.17.5",
+    "npm": "^6.2.0",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
     "restify": "^7.2.1"

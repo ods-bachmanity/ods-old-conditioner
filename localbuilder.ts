@@ -283,6 +283,37 @@ class LocalBuilder {
         process.exit(0)
     }
 
+    private dockerText = `
+FROM node:8.9
+
+COPY _docker /app
+
+#COPY required json file as needed 
+
+WORKDIR /app
+
+RUN npm install
+
+# If you are building your code for production
+
+# RUN npm install --only=production
+
+EXPOSE 8080
+
+CMD [ "npm", "start" ]
+
+#To Build
+
+#docker build -t ods/conditioner .
+# Push to registry
+# Retrieve from registry on AWS
+
+
+#Run image on AWS
+# Use available port
+#docker run --name conditioner -p 8090:8080 -d ods/conditioner
+`
+
 }
 
 const lb = new LocalBuilder()

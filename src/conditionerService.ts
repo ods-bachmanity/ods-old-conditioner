@@ -1,6 +1,6 @@
 import { ErrorHandler } from '../common'
 import { ConditionerResponseSchema, ConditionerExecutionSchema } from './schemas'
-import { ExecutionContext } from './executionContext';
+import { ExecutionContext } from './';
 
 export class ConditionerService {
     

@@ -1,5 +1,5 @@
-import { ConditionerResponseSchema } from '../app/schemas'
-import { DefinitionService, ConditionerService, ExecutionContext } from '../app/';
+import { ConditionerResponseSchema } from '../src/schemas'
+import { ConditionerService } from '../src';
 
 export class BulkConditionerRoute {
     

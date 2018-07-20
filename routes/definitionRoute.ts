@@ -1,4 +1,4 @@
-import { DefinitionService } from '../app'
+import { DefinitionService } from '../src'
 
 export class DefinitionRoute {
     

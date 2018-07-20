@@ -1,5 +1,5 @@
 import * as config from 'config'
-import { ErrorSchema } from '../app/schemas'
+import { ErrorSchema } from '../src/schemas'
 
 export class ErrorHandler {
 

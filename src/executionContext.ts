@@ -47,6 +47,7 @@ export class ExecutionContext {
             }
             catch (err) {
                 console.error(`ExecutionContext.resolveDefinition.error: ${err}`)
+                return reject(`Error retrieving Definition ${this.definitionId}`)
             }
 
         })
