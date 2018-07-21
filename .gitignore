@@ -66,3 +66,4 @@ _docker/
 
 validation-service/validators/
 package-lock.json
+app/node_modules
