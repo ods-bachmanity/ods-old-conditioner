@@ -1,6 +1,7 @@
 import { BaseTransform } from './'
 import { ExecutionContext } from '../'
 import { TransformDefSchema } from '../schemas'
+import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
 
@@ -37,7 +38,7 @@ export class CountryCodeTransform extends BaseTransform {
                 return resolve(true)
             }
             catch (err) {
-                console.error(`CountryCodeTransform.fx().error: ${JSON.stringify(err)}`)
+                ErrorHandler.logError(`CountryCodeTransform.fx().error:`, err)
                 return reject(false)
             }
             
@@ -69,14 +70,13 @@ export class CountryCodeTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.error('ERROR:countryCodeTransform.callService');
-                console.error(err.error ? err.error : err);
+                ErrorHandler.logError(`countryCodeTransform.callService.error:`, err);
                 return reject(false);
             }
             
         })
 
-        return result;
+        return result
 
     }
 

@@ -25,21 +25,21 @@ export class TaskWorker {
                 if (this.fieldSchema.required) {
                     const nullOrEmpty = isNullOrUndefined(fieldValue)
                     if (nullOrEmpty) {
-                        return reject(this.errorResponse(`Required Field is Null or Empty: ${this.fieldSchema.field}`))
+                        return reject(`Required Field is Null or Empty: ${this.fieldSchema.field}`)
                     }
                 }
                 // TEST IF EXACT MATCH
                 if (this.fieldSchema.exactmatch) {
                     const isExactMatch = fieldValue === this.fieldSchema.exactmatch
                     if (!isExactMatch) {
-                        return reject(this.errorResponse(`Field is not an exact match: ${fieldValue} does not equal ${this.fieldSchema.exactmatch}`))
+                        return reject(`Field is not an exact match: ${fieldValue} does not equal ${this.fieldSchema.exactmatch}`)
                     }
                 }
                 // TEST IF WHITE LIST
                 if (this.fieldSchema.whitelist && this.fieldSchema.whitelist.length > 0) {
                     const index = this.fieldSchema.whitelist.indexOf(fieldValue)
                     if (index < 0) {
-                        return reject(this.errorResponse(`Field is not in list of acceptable values: ${fieldValue}`))
+                        return reject(`Field is not in list of acceptable values: ${fieldValue}`)
                     }                    
                 }
 
@@ -47,7 +47,7 @@ export class TaskWorker {
                 if (this.fieldSchema.blacklist && this.fieldSchema.blacklist.length > 0) {
                     const index = this.fieldSchema.blacklist.indexOf(fieldValue)
                     if (index >= 0) {
-                        return reject(this.errorResponse(`Field is in a list of unacceptable values: ${fieldValue}`))
+                        return reject(`Field is in a list of unacceptable values: ${fieldValue}`)
                     }
                 }
 
@@ -58,7 +58,7 @@ export class TaskWorker {
                     matchedCaseRecord = _.find(this.fieldSchema.case, { match: fieldValue })
                     if (this.fieldSchema.mustbeincase) {
                         if (!matchedCaseRecord) {
-                            return reject(this.errorResponse(`Field value does not have a match in the case statement for definition: ${fieldValue}`))
+                            return reject(`Field value does not have a match in the case statement for definition: ${fieldValue}`)
                         }
                     }
                 }
@@ -70,7 +70,7 @@ export class TaskWorker {
                     const transform = this._transformFactory.CreateInstance(this.executionContext, matchedCaseRecord, this.fieldSchema.field)
                     const caseResult = await transform.fx()
                     if (!caseResult) {
-                        return reject(this.errorResponse(`A problem occurred while running transform ${matchedCaseRecord.className}`))
+                        return reject(`A problem occurred while running transform ${matchedCaseRecord.className}`)
                     }
                 }
 
@@ -83,7 +83,7 @@ export class TaskWorker {
                     })
                     const response = await Promise.all(tasks)
                     if (response.indexOf(false) >= 0) {
-                        return reject(this.errorResponse(`A problem occurred while running a transform on field ${this.fieldSchema.field}`))
+                        return reject(`A problem occurred while running a transform on field ${this.fieldSchema.field}`)
                     }
                 }
                 
@@ -96,7 +96,7 @@ export class TaskWorker {
                     })
                     const response = await Promise.all(tasks)
                     if (response.indexOf(false) >= 0) {
-                        return reject(this.errorResponse(`A problem occurred while running an after transform on field ${this.fieldSchema.field}`))
+                        return reject(`A problem occurred while running an after transform on field ${this.fieldSchema.field}`)
                     }
                 }
 
@@ -104,26 +104,14 @@ export class TaskWorker {
                 
             }
             catch (err) {
-                console.error(`TaskWorker.execute().error:`)
-                console.error(`${JSON.stringify(err, null, 2)}`)
-                const errorSchema = ErrorHandler.errorResponse(`TaskWorker.execute().error`,
-                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in TaskWorker for field ${this.fieldSchema.field}`), err)
-                return reject(errorSchema)
+                ErrorHandler.logError(`TaskWorker.execute().error:`, err)
+                return reject(err)
             }
             return resolve()
 
         })
 
         return result
-
-    }
-
-    private errorResponse(message: string): ErrorSchema {
-
-        // return reject(this.errorResponse(`Invalid Field Value for field ${this.fieldSchema.field}`))
-        const myError: ErrorSchema = ErrorHandler.errorResponse(`TaskWorker.execute(${this.fieldSchema.field})`,
-        400, message, null)
-        return myError
 
     }
 

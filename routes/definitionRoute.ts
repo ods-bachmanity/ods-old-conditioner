@@ -1,4 +1,5 @@
 import { DefinitionService } from '../src'
+import { ErrorHandler } from '../common'
 
 export class DefinitionRoute {
     
@@ -30,7 +31,7 @@ export class DefinitionRoute {
                 return next()     
             }
             catch (err) {
-                console.error(`DefinitionRoute.init.get(${path}).error: ${JSON.stringify(err, null, 2)}`)
+                ErrorHandler.logError(`DefinitionRoute.init.get(${path}).error:`, err)
                 res.contentType = 'application/json'
                 res.header('Content-Type', 'application/json')
                 

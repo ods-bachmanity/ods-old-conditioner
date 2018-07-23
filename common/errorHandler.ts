@@ -44,12 +44,37 @@ export class ErrorHandler {
     }
 
     public static errorResponse(source: string, httpStatus: number, message: string, err: any): ErrorSchema {
+
         const errorSchema = new ErrorSchema()
         errorSchema.debug = (!config.production ? source : null)
         errorSchema.httpStatus = httpStatus || 500
         errorSchema.message = message || (err.message ? err.message : 'Error')
         errorSchema.error = (!config.production ? err : null)
         return errorSchema
+
+    }
+
+    public static logError(source: string, err: any) {
+
+        if ((typeof err === "object") && (err !== null)) {
+            return console.error(`ERROR: ${source}: ${JSON.stringify(err, null, 1)}`)
+        }
+        console.error(`ERROR: ${source}: ${err}`)
+
+    }
+
+    private static slimError(err: any): any {
+
+        if (typeof(err) !== 'object') return {
+            message: err
+        }
+
+        if (err.message) {
+            return { message: err.message }
+        }
+
+        return err
+
     }
 
     private errorMessage(err: any) {
@@ -64,4 +89,5 @@ export class ErrorHandler {
         return result
 
     }
+
 }

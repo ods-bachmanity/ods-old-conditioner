@@ -1,5 +1,6 @@
 import { ConditionerResponseSchema } from '../src/schemas'
 import { ConditionerService } from '../src';
+import { ErrorHandler } from '../common'
 
 export class ConditionerRoute {
     
@@ -28,7 +29,7 @@ export class ConditionerRoute {
                 return next()
             }
             catch (err) {
-                console.error(`ConditionerRoute.init.post(${path}).error: ${err}`)
+                ErrorHandler.logError(`ConditionerRoute.init.post(${path}).error:`, err)
 
                 res.contentType = 'application/json'
                 res.header('Content-Type', 'application/json')
@@ -55,7 +56,7 @@ export class ConditionerRoute {
     
             }
             catch (err) {
-                console.error(`conditionerRoute.executeRoute.error: ${err}`)
+                ErrorHandler.logError(`conditionerRoute.executeRoute.error:`, err)
                 return reject(err)
             }
 

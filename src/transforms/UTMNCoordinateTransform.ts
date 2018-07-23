@@ -1,6 +1,7 @@
 import { ExecutionContext } from '../'
 import { TransformDefSchema } from '../schemas'
 import { BaseTransform } from './'
+import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
 
@@ -94,7 +95,7 @@ export class UTMNCoordinateTransform extends BaseTransform {
 
             }
             catch (err) {
-                console.error(`ERROR:utmn_coordinateTransform.fx:${err}`)
+                ErrorHandler.logError(`utmnCoordinateTransform.fx.error:`, err)
                 return reject(false)
             }
         })
@@ -123,9 +124,8 @@ export class UTMNCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.error('ERROR:utmnCoordinateTransform.callService')
-                console.error(err)
-                return reject(null)
+                ErrorHandler.logError('utmnCoordinateTransform.callService.error:', err)
+                return reject(false)
             }
         })
 

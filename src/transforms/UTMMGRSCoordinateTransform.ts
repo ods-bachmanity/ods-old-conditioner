@@ -1,6 +1,7 @@
 import { ExecutionContext } from '../'
 import { TransformDefSchema } from '../schemas'
-import { BaseTransform } from './baseTransform';
+import { BaseTransform } from './'
+import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
 
@@ -57,7 +58,7 @@ export class UTMMGRSCoordinateTransform extends BaseTransform {
 
             }
             catch (err) {
-                console.error(`ERROR:utmmgrs_coordinateTransform.fx:${err}`)
+                ErrorHandler.logError(`utmmgrsCoordinateTransform.fx.error:`, err)
                 return reject(false)
             }
         })
@@ -86,9 +87,8 @@ export class UTMMGRSCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.error('ERROR:utmmgrsCoordinateTransform.callService')
-                console.error(err)
-                return reject(null)
+                ErrorHandler.logError('utmmgrsCoordinateTransform.callService.error:', err)
+                return reject(false)
             }
 
         })

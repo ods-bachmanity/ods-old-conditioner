@@ -1,4 +1,5 @@
 import { HealthCheckService } from '../common'
+import { ErrorHandler } from '../common'
 
 export class HealthCheckRoute {
     
@@ -18,7 +19,7 @@ export class HealthCheckRoute {
                 return next()
             }
             catch (err) {
-                console.error(`HealthCheckRoute.init.get(${path}).error: ${JSON.stringify(err, null, 2)}`)
+                ErrorHandler.logError(`HealthCheckRoute.init.get(${path}).error:`, err)
                 res.contentType = 'application/json'
                 res.header('Content-Type', 'application/json')
                 

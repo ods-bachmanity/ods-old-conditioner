@@ -79,10 +79,9 @@ export class ElasticSearchComposer extends BaseComposer {
                 return resolve(fileObject)
             }
             catch (err) {
+                ErrorHandler.logError(`ElasticSearchComposer.fx.error:`, err)
                 const error = ErrorHandler.errorResponse(`ElasticSearchComposer.fx()`, 
                     500, err.message || err.error ? err.message || err.error : `Error`, err)
-                console.error(`ElasticSearchComposer.fx().error:`)
-                console.error(`${JSON.stringify(err.message || err.error ? err.message || err.error : err, null, 2)}`)
                 return reject(error)
             }
         })

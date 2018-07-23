@@ -1,5 +1,6 @@
 import { BaseAction } from './'
 import { AuthenticationStrategies } from '../schemas'
+import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
 import * as _ from 'lodash'
@@ -52,7 +53,8 @@ export class ElasticUpdateAction extends BaseAction {
                 
             }
             catch (err) {
-                console.error(`ElasticUpdateAction.fx.error: ${err}`)
+                ErrorHandler.logError(`elasticUpdateAction.fx`, err)
+                // TODO: Error Handling
                 this.executionContext.mapped.ods.conditioners[this.executionContext.definition.id] = {
                     version: '0.0.1',
                     timestamp: `${timestamp}`,

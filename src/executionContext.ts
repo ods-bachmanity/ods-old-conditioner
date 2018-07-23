@@ -46,7 +46,7 @@ export class ExecutionContext {
     
             }
             catch (err) {
-                console.error(`ExecutionContext.resolveDefinition.error: ${err}`)
+                ErrorHandler.logError(`ExecutionContext.resolveDefinition.error:`, err)
                 return reject(`Error retrieving Definition ${this.definitionId}`)
             }
 
@@ -129,7 +129,7 @@ export class ExecutionContext {
 
             }
             catch (err) {
-                console.error(`ExecutionContext.compose().error: ${err}`)
+                ErrorHandler.logError(`ExecutionContext.compose().error:`, err)
                 const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.compose().error`,
                     err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
                 return reject(errorSchema)
@@ -174,8 +174,7 @@ export class ExecutionContext {
                 return resolve(Object.assign({}, this.transformed))
             }
             catch (err) {
-                console.error(`ExecutionContext.schema().error:`)
-                console.error(`${JSON.stringify(err, null, 2)}`)
+                ErrorHandler.logError(`ExecutionContext.schema().error:`, err)
                 const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.schema().error`,
                     err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
                 return reject(errorSchema)
@@ -214,7 +213,7 @@ export class ExecutionContext {
 
             }
             catch (err) {
-                console.error(`ExecutionContext.map().error: ${err}`)
+                ErrorHandler.logError(`ExecutionContext.map().error:`, err)
                 const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.map().error`,
                     err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
                 return reject(errorSchema)
@@ -257,7 +256,7 @@ export class ExecutionContext {
                 }
             }
             catch (err) {
-                console.error(`ExecutionContext.act().error: ${err}`)
+                ErrorHandler.logError(`ExecutionContext.act().error:`, err)
                 const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.act().error`,
                     err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
                 return reject(errorSchema)
@@ -291,7 +290,7 @@ export class ExecutionContext {
                 
             }
             catch (err) {
-                console.error(`ExecutionContext.respond.error: ${err}`)
+                ErrorHandler.logError(`ExecutionContext.respond.error:`, err)
                 return reject(response)
             }    
 

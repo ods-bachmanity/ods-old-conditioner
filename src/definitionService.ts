@@ -38,8 +38,7 @@ export class DefinitionService {
                     error.httpStatus = 404
                     return reject(error)
                 }
-                console.error(`DefinitionService.get(${id}).error:`)
-                console.error(`${JSON.stringify(err, null, 2)}`)
+                ErrorHandler.logError(`DefinitionService.get(${id}).error:`, err)
                 return reject(error)
             }
 

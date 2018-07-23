@@ -1,6 +1,7 @@
 import { ExecutionContext } from '../'
 import { TransformDefSchema } from '../schemas'
-import { BaseTransform } from './baseTransform';
+import { BaseTransform } from './'
+import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
 
@@ -73,7 +74,7 @@ export class UTMSCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.error(`ERROR:utms_coordinateTransform.fx:${err}`)
+                ErrorHandler.logError(`utmsCoordinateTransform.fx.error:`, err)
                 return reject(false)
             }
         })
@@ -102,37 +103,36 @@ export class UTMSCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.error('ERROR:utmsCoordinateTransform.callService')
-                console.error(err)
-                return reject(null)
+                ErrorHandler.logError('utmsCoordinateTransform.callService.error:', err)
+                return reject(false)
             }
     
         })
 
-        return result;
+        return result
     }
 
 }
 
 class CoordinateConversionRequest {
-    lonRange: number = 0;
-    leadingZeros: boolean = false;
-    signHemisphere: number = 0;
-    geodeiticUnits: number = 2;
-    sourceDatum: string = "WGE";
-    sourceCoordinateType: number = 34;
-    sourceHeightType: number = 0;
-    sourceZone: boolean = false;
-    targetDatum: string = "WGE";
-    targetCoordinateType: number = 10;
-    targetHeightType: number = 0;
-    targetZone: boolean = false;
-    sourceCoordinates: Array<SourceCoordinate> = [];
+    lonRange: number = 0
+    leadingZeros: boolean = false
+    signHemisphere: number = 0
+    geodeiticUnits: number = 2
+    sourceDatum: string = 'WGE'
+    sourceCoordinateType: number = 34
+    sourceHeightType: number = 0
+    sourceZone: boolean = false
+    targetDatum: string = 'WGE'
+    targetCoordinateType: number = 10
+    targetHeightType: number = 0
+    targetZone: boolean = false
+    sourceCoordinates: Array<SourceCoordinate> = []
 }
 
 class SourceCoordinate {
-    sourceEasting: string = '';
-    sourceNorthing: string = '';
-    sourceHemisphere: string = 'S';
-    sourceZoneData: string = '';
+    sourceEasting: string = ''
+    sourceNorthing: string = ''
+    sourceHemisphere: string = 'S'
+    sourceZoneData: string = ''
 }

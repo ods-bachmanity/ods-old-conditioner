@@ -1,0 +1,89 @@
+{
+    "id": "hrte",
+    "description": "Handle all HRTE files",
+    "parameters": [
+        {"key": "fileuri", "value": "req.body.fileuri"},
+        {"key": "fingerprint", "value": "req.body.fingerprint||0"},
+        {"key": "version", "value": "req.body.version||0"},
+        {"key": "username", "value": ".env.ELASTICUID"},
+        {"key": "password", "value": ".env.ELASTICPWD"},
+        {"key": "catalog_endpoint_search", "value": "req.body.catalog_endpoint_search||.env.EMCCATALOGSERVICEURLGET"},
+        {"key": "catalog_endpoint_update", "value": "req.body.catalog_endpoint_update||.env.EMCCATALOGSERVICEURLPOST"}
+    ],
+    "composers": [
+        {
+            "className": "ElasticSearchComposer",
+            "args": [
+                {"key": "auth", "value": "basic"}
+            ]
+        }
+    ],
+    "schema": [
+        {
+            "field": "UTMZone",
+            "ordinal": 0,
+            "required": true,
+            "whitelist": [],
+            "blacklist": [],
+            "transforms": [
+                {
+                    "className": "HRTECoordinateTransform",
+                    "args": []
+                }
+            ],
+            "after": [
+                {
+                    "className": "CountryCodeTransform",
+                    "args": []
+                }
+            ]
+        }
+    ],
+    "mapStructure": {
+        "resourcegeographiclocation": {
+            "coordType": "",
+            "wkt": "",
+            "geojson": {
+                "type": "Feature",
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": []
+                },
+                "properties": {
+                    "countrycodes": [],
+                    "name": []
+                }
+            }
+        }
+    },
+    "maps": [
+        {
+            "source": "Metadata.COORD_GEOJSON.geometry.coordinates",
+            "target": "resourcegeographiclocation.geojson.geometry.coordinates"
+        },
+        {
+            "source": "Metadata.COORD_WKT",
+            "target": "resourcegeographiclocation.wkt"
+        },
+        {
+            "source": "Metadata.COORD_TYPE",
+            "target": "resourcegeographiclocation.coordType"
+        },
+        {
+            "source": "Metadata.GENC_3",
+            "target": "resourcegeographiclocation.geojson.properties.countrycodes"
+        },
+        {
+            "source": "Metadata.GENC_NAMES",
+            "target": "resourcegeographiclocation.geojson.properties.name"
+        }
+    ],
+    "actions": [
+        {
+            "className": "ElasticUpdateAction",
+            "args": [
+                {"key": "auth", "value": "basic"}
+            ]
+        }
+    ]
+}

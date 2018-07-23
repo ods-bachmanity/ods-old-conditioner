@@ -1,5 +1,6 @@
 import { BaseTransform } from './'
 import { CoordinateSchema } from '../schemas'
+import { ErrorHandler } from '../../common'
 
 export class DecimalDegreesCoordinateTransform extends BaseTransform {
 
@@ -87,7 +88,7 @@ export class DecimalDegreesCoordinateTransform extends BaseTransform {
 
             }
             catch (err) {
-                console.error(`Error in DecimalDegreesCoordinateTransform.fx(): ${JSON.stringify(err, null, 2)}`)
+                ErrorHandler.logError(`DecimalDegreesCoordinateTransform.fx().error:`, err)
                 return reject(false)
             }
 

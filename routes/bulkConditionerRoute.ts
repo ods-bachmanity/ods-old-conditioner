@@ -1,5 +1,6 @@
 import { ConditionerResponseSchema } from '../src/schemas'
 import { ConditionerService } from '../src';
+import { ErrorHandler } from '../common'
 
 export class BulkConditionerRoute {
     
@@ -60,8 +61,8 @@ export class BulkConditionerRoute {
         
             }
             catch (err) {
-                console.error(`BulkConditionerRoute.init.post(${path}).error: ${err}`)
-                
+                ErrorHandler.logError(`BulkConditionerRoute.init.post(${path}).error:`, err)
+                // TODO: Error Handling
                 res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()
             }
@@ -85,7 +86,7 @@ export class BulkConditionerRoute {
     
             }
             catch (err) {
-                console.error(`bulkConditionerRoute.executeRoute.error: ${err}`)
+                ErrorHandler.logError(`bulkConditionerRoute.executeRoute.error:`, err)
                 return reject(err)
             }
 

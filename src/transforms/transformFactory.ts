@@ -5,7 +5,9 @@ import {
     GeographicCoordinateTransform,
     UTMMGRSCoordinateTransform,
     UTMNCoordinateTransform,
-    UTMSCoordinateTransform
+    UTMSCoordinateTransform,
+    HRTECoordinateTransform,
+    CoordinateTransform
 } from './'
 import { TransformDefSchema } from '../schemas'
 import { ExecutionContext } from '../'
@@ -18,7 +20,9 @@ export class TransformFactory {
         GeographicCoordinateTransform,
         UTMMGRSCoordinateTransform,
         UTMNCoordinateTransform,
-        UTMSCoordinateTransform
+        UTMSCoordinateTransform,
+        HRTECoordinateTransform,
+        CoordinateTransform
     }
 
     constructor() {}

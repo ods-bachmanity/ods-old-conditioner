@@ -23,57 +23,58 @@ export class BaseTransform {
     protected toGeoJSON(input: Array<CoordinateSchema>): any {
 
         if (!input || input.length <= 0) {
-            return {};
+            return {}
         }
-        const result: Array<Array<number>> = [];
+        const result: Array<Array<number>> = []
         input.forEach((item: CoordinateSchema) => {
-            const point = [];
-            point.push(item.Longitude);
-            point.push(item.Latitude);
-            point.push(item.Height);
-            result.push(point);
+            const point = []
+            point.push(item.Longitude)
+            point.push(item.Latitude)
+            point.push(item.Height)
+            result.push(point)
         })
         // Push first point onto the end of the array to close GeoJSON polygon.
-        let item: CoordinateSchema = input[0];
+        let item: CoordinateSchema = input[0]
         if (result.length < 5) {
-            let point = [];
-            point.push(item.Longitude);
-            point.push(item.Latitude);
-            point.push(item.Height);
-            result.push(point);
+            let point = []
+            point.push(item.Longitude)
+            point.push(item.Latitude)
+            point.push(item.Height)
+            result.push(point)
         }
 
-        const wrapper = [];
-        wrapper.push(result);
+        const wrapper = []
+        wrapper.push(result)
         
         return {
-          type: "Feature",
+          type: 'Feature',
           geometry: {
-              type: "Polygon",
+              type: 'Polygon',
               coordinates: wrapper,
           },
           properties: {}
-        };
+        }
 
     }
 
     protected toWkt(input: Array<CoordinateSchema>): string {
 
         if (!input || input.length <= 0) {
-            return '';
+            return ''
         }
-        let output = 'POLYGON ((';
+        let output = 'POLYGON (('
         input.forEach((item: CoordinateSchema) => {
             if (output.length > 10) {
-                output += ',';
+                output += ','
             }
-            output += `${item.Longitude} ${item.Latitude}`; // ${item.Height}`;
+            output += `${item.Longitude} ${item.Latitude}` // ${item.Height}`;
         });
         if (input.length < 5) {
-            output += `,${input[0].Longitude} ${input[0].Latitude}`; // ${input[0].Height}`;
+            output += `,${input[0].Longitude} ${input[0].Latitude}` // ${input[0].Height}`;
         }
-        output += '))';
-        return output;
+        output += '))'
+        return output
+        
     }
 
 }

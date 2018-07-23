@@ -1,4 +1,5 @@
 import { SwaggerService } from '../common'
+import { ErrorHandler } from '../common'
 
 export class SwaggerRoute {
     
@@ -20,7 +21,7 @@ export class SwaggerRoute {
                 return next();        
             }
             catch (err) {
-                console.error(`SwaggerRoute.init.get(${path}).error: ${JSON.stringify(err, null, 2)}`)
+                ErrorHandler.logError(`SwaggerRoute.init.get(${path}).error:`, err)
                 res.contentType = 'application/json'
                 res.header('Content-Type', 'application/json')
                 

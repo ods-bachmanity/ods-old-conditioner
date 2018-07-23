@@ -37,7 +37,7 @@ export class ConditionerService {
 
             }
             catch (err) {
-                console.error(`ConditionerService.execute(${definitionId}).error: ${err}`)
+                ErrorHandler.logError(`ConditionerService.execute(${definitionId}).error:`, err)
                 const errorSchema = ErrorHandler.errorResponse(`ConditionerService.execute(${definitionId})`,
                     err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ConditionerService`), err)
                 return reject(errorSchema)

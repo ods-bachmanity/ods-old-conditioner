@@ -1,6 +1,7 @@
 import { ExecutionContext } from '../'
 import { TransformDefSchema } from '../schemas'
-import { BaseTransform } from './baseTransform';
+import { BaseTransform } from './'
+import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
 
@@ -73,7 +74,7 @@ export class GeographicCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.error(`ERROR:geographic_coordinateTransform.fx:${err}`)
+                ErrorHandler.logError(`geographicCoordinateTransform.fx.error:`, err)
                 return reject(false)
             }
 
@@ -103,14 +104,13 @@ export class GeographicCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                console.error('ERROR:geographicCoordinateTransform.callService')
-                console.error(err)
-                return reject(null)
+                ErrorHandler.logError('geographicCoordinateTransform.callService.error:', err)
+                return reject(false)
             }
             
         })
 
-        return result;
+        return result
 
     }
 
