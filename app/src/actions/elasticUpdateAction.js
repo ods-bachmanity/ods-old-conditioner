@@ -47,6 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var _1 = require("./");
 var schemas_1 = require("../schemas");
+var common_1 = require("../../common");
 var rp = require('request-promise');
 var _ = require("lodash");
 var ElasticUpdateAction = (function (_super) {
@@ -96,7 +97,7 @@ var ElasticUpdateAction = (function (_super) {
                         return [2, resolve(JSON.parse(response))];
                     case 3:
                         err_1 = _a.sent();
-                        console.error("ElasticUpdateAction.fx.error: " + err_1);
+                        common_1.ErrorHandler.logError("elasticUpdateAction.fx", err_1);
                         this.executionContext.mapped.ods.conditioners[this.executionContext.definition.id] = {
                             version: '0.0.1',
                             timestamp: "" + timestamp,

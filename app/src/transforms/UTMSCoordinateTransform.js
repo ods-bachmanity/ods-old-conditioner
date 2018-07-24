@@ -45,7 +45,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var baseTransform_1 = require("./baseTransform");
+var _1 = require("./");
+var common_1 = require("../../common");
 var rp = require('request-promise');
 var UTMSCoordinateTransform = (function (_super) {
     __extends(UTMSCoordinateTransform, _super);
@@ -99,7 +100,7 @@ var UTMSCoordinateTransform = (function (_super) {
                     case 2: return [2, reject(false)];
                     case 3:
                         err_1 = _a.sent();
-                        console.error("ERROR:utms_coordinateTransform.fx:" + err_1);
+                        common_1.ErrorHandler.logError("utmsCoordinateTransform.fx.error:", err_1);
                         return [2, reject(false)];
                     case 4: return [2];
                 }
@@ -129,9 +130,8 @@ var UTMSCoordinateTransform = (function (_super) {
                         return [2, resolve(records)];
                     case 2:
                         err_2 = _a.sent();
-                        console.error('ERROR:utmsCoordinateTransform.callService');
-                        console.error(err_2);
-                        return [2, reject(null)];
+                        common_1.ErrorHandler.logError('utmsCoordinateTransform.callService.error:', err_2);
+                        return [2, reject(false)];
                     case 3: return [2];
                 }
             });
@@ -139,7 +139,7 @@ var UTMSCoordinateTransform = (function (_super) {
         return result;
     };
     return UTMSCoordinateTransform;
-}(baseTransform_1.BaseTransform));
+}(_1.BaseTransform));
 exports.UTMSCoordinateTransform = UTMSCoordinateTransform;
 var CoordinateConversionRequest = (function () {
     function CoordinateConversionRequest() {
@@ -147,11 +147,11 @@ var CoordinateConversionRequest = (function () {
         this.leadingZeros = false;
         this.signHemisphere = 0;
         this.geodeiticUnits = 2;
-        this.sourceDatum = "WGE";
+        this.sourceDatum = 'WGE';
         this.sourceCoordinateType = 34;
         this.sourceHeightType = 0;
         this.sourceZone = false;
-        this.targetDatum = "WGE";
+        this.targetDatum = 'WGE';
         this.targetCoordinateType = 10;
         this.targetHeightType = 0;
         this.targetZone = false;

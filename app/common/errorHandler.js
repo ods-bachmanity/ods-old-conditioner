@@ -46,6 +46,22 @@ var ErrorHandler = (function () {
         errorSchema.error = (!config.production ? err : null);
         return errorSchema;
     };
+    ErrorHandler.logError = function (source, err) {
+        if ((typeof err === "object") && (err !== null)) {
+            return console.error("ERROR: " + source + ": " + JSON.stringify(err, null, 1));
+        }
+        console.error("ERROR: " + source + ": " + err);
+    };
+    ErrorHandler.slimError = function (err) {
+        if (typeof (err) !== 'object')
+            return {
+                message: err
+            };
+        if (err.message) {
+            return { message: err.message };
+        }
+        return err;
+    };
     ErrorHandler.prototype.errorMessage = function (err) {
         if (config.production) {
             return this._defaultMessage;

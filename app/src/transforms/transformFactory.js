@@ -9,7 +9,9 @@ var TransformFactory = (function () {
             GeographicCoordinateTransform: _1.GeographicCoordinateTransform,
             UTMMGRSCoordinateTransform: _1.UTMMGRSCoordinateTransform,
             UTMNCoordinateTransform: _1.UTMNCoordinateTransform,
-            UTMSCoordinateTransform: _1.UTMSCoordinateTransform
+            UTMSCoordinateTransform: _1.UTMSCoordinateTransform,
+            HRTECoordinateTransform: _1.HRTECoordinateTransform,
+            CoordinateTransform: _1.CoordinateTransform
         };
     }
     TransformFactory.prototype.CreateInstance = function (executionContext, transformDef, fieldName) {

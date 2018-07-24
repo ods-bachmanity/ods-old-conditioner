@@ -75,8 +75,7 @@ var DefinitionService = (function () {
                             error.httpStatus = 404;
                             return [2, reject(error)];
                         }
-                        console.error("DefinitionService.get(" + id + ").error:");
-                        console.error("" + JSON.stringify(err_1, null, 2));
+                        common_1.ErrorHandler.logError("DefinitionService.get(" + id + ").error:", err_1);
                         return [2, reject(error)];
                     case 5: return [2];
                 }

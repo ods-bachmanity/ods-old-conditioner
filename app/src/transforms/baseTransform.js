@@ -34,9 +34,9 @@ var BaseTransform = (function () {
         var wrapper = [];
         wrapper.push(result);
         return {
-            type: "Feature",
+            type: 'Feature',
             geometry: {
-                type: "Polygon",
+                type: 'Polygon',
                 coordinates: wrapper,
             },
             properties: {}

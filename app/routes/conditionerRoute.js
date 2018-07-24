@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var src_1 = require("../src");
+var common_1 = require("../common");
 var ConditionerRoute = (function () {
     function ConditionerRoute(server) {
         this.server = server;
@@ -64,7 +65,7 @@ var ConditionerRoute = (function () {
                         return [2, next()];
                     case 2:
                         err_1 = _a.sent();
-                        console.error("ConditionerRoute.init.post(" + path + ").error: " + err_1);
+                        common_1.ErrorHandler.logError("ConditionerRoute.init.post(" + path + ").error:", err_1);
                         res.contentType = 'application/json';
                         res.header('Content-Type', 'application/json');
                         res.send(err_1.httpStatus ? err_1.httpStatus : 500, err_1);
@@ -92,7 +93,7 @@ var ConditionerRoute = (function () {
                                 return [2, resolve(records)];
                             case 2:
                                 err_2 = _a.sent();
-                                console.error("conditionerRoute.executeRoute.error: " + err_2);
+                                common_1.ErrorHandler.logError("conditionerRoute.executeRoute.error:", err_2);
                                 return [2, reject(err_2)];
                             case 3: return [2];
                         }

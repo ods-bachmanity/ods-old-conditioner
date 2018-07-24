@@ -49,7 +49,7 @@ var TaskWorker = (function () {
     TaskWorker.prototype.execute = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var fieldValue, nullOrEmpty, isExactMatch, index, index, matchedCaseRecord, transform, caseResult, tasks_1, response, tasks_2, response, err_1, errorSchema;
+            var fieldValue, nullOrEmpty, isExactMatch, index, index, matchedCaseRecord, transform, caseResult, tasks_1, response, tasks_2, response, err_1;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -61,25 +61,25 @@ var TaskWorker = (function () {
                         if (this.fieldSchema.required) {
                             nullOrEmpty = util_1.isNullOrUndefined(fieldValue);
                             if (nullOrEmpty) {
-                                return [2, reject(this.errorResponse("Required Field is Null or Empty: " + this.fieldSchema.field))];
+                                return [2, reject("Required Field is Null or Empty: " + this.fieldSchema.field)];
                             }
                         }
                         if (this.fieldSchema.exactmatch) {
                             isExactMatch = fieldValue === this.fieldSchema.exactmatch;
                             if (!isExactMatch) {
-                                return [2, reject(this.errorResponse("Field is not an exact match: " + fieldValue + " does not equal " + this.fieldSchema.exactmatch))];
+                                return [2, reject("Field is not an exact match: " + fieldValue + " does not equal " + this.fieldSchema.exactmatch)];
                             }
                         }
                         if (this.fieldSchema.whitelist && this.fieldSchema.whitelist.length > 0) {
                             index = this.fieldSchema.whitelist.indexOf(fieldValue);
                             if (index < 0) {
-                                return [2, reject(this.errorResponse("Field is not in list of acceptable values: " + fieldValue))];
+                                return [2, reject("Field is not in list of acceptable values: " + fieldValue)];
                             }
                         }
                         if (this.fieldSchema.blacklist && this.fieldSchema.blacklist.length > 0) {
                             index = this.fieldSchema.blacklist.indexOf(fieldValue);
                             if (index >= 0) {
-                                return [2, reject(this.errorResponse("Field is in a list of unacceptable values: " + fieldValue))];
+                                return [2, reject("Field is in a list of unacceptable values: " + fieldValue)];
                             }
                         }
                         matchedCaseRecord = null;
@@ -87,7 +87,7 @@ var TaskWorker = (function () {
                             matchedCaseRecord = _.find(this.fieldSchema.case, { match: fieldValue });
                             if (this.fieldSchema.mustbeincase) {
                                 if (!matchedCaseRecord) {
-                                    return [2, reject(this.errorResponse("Field value does not have a match in the case statement for definition: " + fieldValue))];
+                                    return [2, reject("Field value does not have a match in the case statement for definition: " + fieldValue)];
                                 }
                             }
                         }
@@ -97,7 +97,7 @@ var TaskWorker = (function () {
                     case 1:
                         caseResult = _a.sent();
                         if (!caseResult) {
-                            return [2, reject(this.errorResponse("A problem occurred while running transform " + matchedCaseRecord.className))];
+                            return [2, reject("A problem occurred while running transform " + matchedCaseRecord.className)];
                         }
                         _a.label = 2;
                     case 2:
@@ -111,7 +111,7 @@ var TaskWorker = (function () {
                     case 3:
                         response = _a.sent();
                         if (response.indexOf(false) >= 0) {
-                            return [2, reject(this.errorResponse("A problem occurred while running a transform on field " + this.fieldSchema.field))];
+                            return [2, reject("A problem occurred while running a transform on field " + this.fieldSchema.field)];
                         }
                         _a.label = 4;
                     case 4:
@@ -125,25 +125,19 @@ var TaskWorker = (function () {
                     case 5:
                         response = _a.sent();
                         if (response.indexOf(false) >= 0) {
-                            return [2, reject(this.errorResponse("A problem occurred while running an after transform on field " + this.fieldSchema.field))];
+                            return [2, reject("A problem occurred while running an after transform on field " + this.fieldSchema.field)];
                         }
                         _a.label = 6;
                     case 6: return [2, resolve(Object.assign({}, this.executionContext.transformed))];
                     case 7:
                         err_1 = _a.sent();
-                        console.error("TaskWorker.execute().error:");
-                        console.error("" + JSON.stringify(err_1, null, 2));
-                        errorSchema = common_1.ErrorHandler.errorResponse("TaskWorker.execute().error", err_1.httpStatus ? err_1.httpStatus : 500, (err_1.message ? err_1.message : "Error in TaskWorker for field " + this.fieldSchema.field), err_1);
-                        return [2, reject(errorSchema)];
+                        common_1.ErrorHandler.logError("TaskWorker.execute().error:", err_1);
+                        return [2, reject(err_1)];
                     case 8: return [2, resolve()];
                 }
             });
         }); });
         return result;
-    };
-    TaskWorker.prototype.errorResponse = function (message) {
-        var myError = common_1.ErrorHandler.errorResponse("TaskWorker.execute(" + this.fieldSchema.field + ")", 400, message, null);
-        return myError;
     };
     return TaskWorker;
 }());

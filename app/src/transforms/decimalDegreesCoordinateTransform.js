@@ -11,6 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var _1 = require("./");
+var common_1 = require("../../common");
 var DecimalDegreesCoordinateTransform = (function (_super) {
     __extends(DecimalDegreesCoordinateTransform, _super);
     function DecimalDegreesCoordinateTransform() {
@@ -68,7 +69,7 @@ var DecimalDegreesCoordinateTransform = (function (_super) {
                 return reject(false);
             }
             catch (err) {
-                console.error("Error in DecimalDegreesCoordinateTransform.fx(): " + JSON.stringify(err, null, 2));
+                common_1.ErrorHandler.logError("DecimalDegreesCoordinateTransform.fx().error:", err);
                 return reject(false);
             }
         });

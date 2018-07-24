@@ -24,8 +24,6 @@ script `npm run bundle` is executed. Please do not make changes and check into s
 - **Deployment (Docker)**: TODO: `npm run docker` creates a local `./docker` directory with code packaged ready for docker instantiation. IN PROGRESS.
 - **Parameter Precondition Automated**: TODO: using definition, allow author to describe mandatory parameters with values vs. optional.
 
-
-
 ## environment
 Begin with `npm install`.
 
@@ -47,7 +45,7 @@ to deploy. Final bundle does not include nodemon or TypeScript.
     - API Prefix path (default to `/api/`)
     - Serve Static Content (any non-empty string maps to root of project. Use absolute or relative paths. Defaults to `./public/`)
     - API Port (defaults to 8080)
-4. Create services in new folder (ex. `/app/shoes`). Can mimic pattern within `/common/healthCheck.ts`.
+4. Create services in new folder (ex. `/src/shoes`). Can mimic pattern within `/common/healthCheck.ts`.
 5. Create route handler inside `/routes/router.ts` to map to new service above.
 6. If services rely on an external database connection, be sure to wrap the `rs.start()` method call of `index.ts` inside the callback from that connections startup asynchronous method e.g. don't start the server until the database connection pool has been started up and any necessary seeding processes completed.
     - e.g. `database.connection.open((err) => if (!err) rs.start() )` <- where the parameter to the open method is an asynchronous callback called only after the connection is established.
@@ -70,8 +68,8 @@ You can place any static content into (default `./public/`) folder and those ass
 Anything created in `./public/` will be served as is e.g. Angular, React, Vue, PWA
 
 To create a new Web API:
-1. Create Service file in `./app/` folder
-2. Export Service Class from `./app/index.ts`
+1. Create Service file in `./src/` folder
+2. Export Service Class from `./src/index.ts`
 3. Create Route in `./routes/`
 4. Export Route in `./routes/index.ts`
 5. Import Route in `./routes/router.ts`

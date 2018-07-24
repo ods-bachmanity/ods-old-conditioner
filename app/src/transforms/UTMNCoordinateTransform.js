@@ -46,6 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var _1 = require("./");
+var common_1 = require("../../common");
 var rp = require('request-promise');
 var UTMNCoordinateTransform = (function (_super) {
     __extends(UTMNCoordinateTransform, _super);
@@ -113,7 +114,7 @@ var UTMNCoordinateTransform = (function (_super) {
                     case 2: return [2, reject(false)];
                     case 3:
                         err_1 = _a.sent();
-                        console.error("ERROR:utmn_coordinateTransform.fx:" + err_1);
+                        common_1.ErrorHandler.logError("utmnCoordinateTransform.fx.error:", err_1);
                         return [2, reject(false)];
                     case 4: return [2];
                 }
@@ -143,9 +144,8 @@ var UTMNCoordinateTransform = (function (_super) {
                         return [2, resolve(records)];
                     case 2:
                         err_2 = _a.sent();
-                        console.error('ERROR:utmnCoordinateTransform.callService');
-                        console.error(err_2);
-                        return [2, reject(null)];
+                        common_1.ErrorHandler.logError('utmnCoordinateTransform.callService.error:', err_2);
+                        return [2, reject(false)];
                     case 3: return [2];
                 }
             });

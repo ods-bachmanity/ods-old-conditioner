@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var common_1 = require("../common");
+var common_2 = require("../common");
 var HealthCheckRoute = (function () {
     function HealthCheckRoute(server) {
         this.server = server;
@@ -57,7 +58,7 @@ var HealthCheckRoute = (function () {
                         return [2, next()];
                     case 2:
                         err_1 = _a.sent();
-                        console.error("HealthCheckRoute.init.get(" + path + ").error: " + JSON.stringify(err_1, null, 2));
+                        common_2.ErrorHandler.logError("HealthCheckRoute.init.get(" + path + ").error:", err_1);
                         res.contentType = 'application/json';
                         res.header('Content-Type', 'application/json');
                         res.send(err_1.httpStatus ? err_1.httpStatus : 500, err_1);

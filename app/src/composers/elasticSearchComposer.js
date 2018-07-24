@@ -118,9 +118,8 @@ var ElasticSearchComposer = (function (_super) {
                         return [2, resolve(fileObject)];
                     case 2:
                         err_1 = _a.sent();
+                        common_1.ErrorHandler.logError("ElasticSearchComposer.fx.error:", err_1);
                         error = common_1.ErrorHandler.errorResponse("ElasticSearchComposer.fx()", 500, err_1.message || err_1.error ? err_1.message || err_1.error : "Error", err_1);
-                        console.error("ElasticSearchComposer.fx().error:");
-                        console.error("" + JSON.stringify(err_1.message || err_1.error ? err_1.message || err_1.error : err_1, null, 2));
                         return [2, reject(error)];
                     case 3: return [2];
                 }

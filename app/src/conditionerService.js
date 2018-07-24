@@ -81,7 +81,7 @@ var ConditionerService = (function () {
                         return [2, resolve(response)];
                     case 7:
                         err_1 = _e.sent();
-                        console.error("ConditionerService.execute(" + definitionId + ").error: " + err_1);
+                        common_1.ErrorHandler.logError("ConditionerService.execute(" + definitionId + ").error:", err_1);
                         errorSchema = common_1.ErrorHandler.errorResponse("ConditionerService.execute(" + definitionId + ")", err_1.httpStatus ? err_1.httpStatus : 500, (err_1.message ? err_1.message : "Error in ConditionerService"), err_1);
                         return [2, reject(errorSchema)];
                     case 8: return [2];

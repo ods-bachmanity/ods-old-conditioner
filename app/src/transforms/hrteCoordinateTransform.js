@@ -48,9 +48,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var _1 = require("./");
 var common_1 = require("../../common");
 var rp = require('request-promise');
-var GeographicCoordinateTransform = (function (_super) {
-    __extends(GeographicCoordinateTransform, _super);
-    function GeographicCoordinateTransform(executionContext, transformDef, fieldName) {
+var HRTECoordinateTransform = (function (_super) {
+    __extends(HRTECoordinateTransform, _super);
+    function HRTECoordinateTransform(executionContext, transformDef, fieldName) {
         var _this = _super.call(this, executionContext, transformDef, fieldName) || this;
         _this.executionContext = executionContext;
         _this.transformDef = transformDef;
@@ -58,56 +58,98 @@ var GeographicCoordinateTransform = (function (_super) {
         _this._servicePath = process.env.COORDINATECONVERSIONSERVICEURL;
         return _this;
     }
-    GeographicCoordinateTransform.prototype.fx = function () {
+    HRTECoordinateTransform.prototype.fx = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var nitfIGEOLO, LAT_LENGTH, LON_LENGTH, COORD_LENGTH, myNewInstance, i, coordinate, rawSubLat, rawSubLon, formattedLat, formattedLon, body, err_1;
+            var rawUtmZone, zoneLength, utmHemisphere_1, utmZone_1, myNewInstance_1, footprint, points, pointCount_1, nMin, i, i, body, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
+                        _a.trys.push([0, 2, , 3]);
                         if (this.executionContext.transformed.Metadata.COORD_GEOJSON)
                             return [2, resolve(true)];
-                        nitfIGEOLO = this.executionContext.transformed.Metadata.NITF_IGEOLO;
-                        if (!(nitfIGEOLO && nitfIGEOLO.length === 60)) return [3, 2];
-                        LAT_LENGTH = 7;
-                        LON_LENGTH = 8;
-                        COORD_LENGTH = 15;
-                        myNewInstance = new CoordinateConversionRequest();
-                        for (i = 0; i <= 3; i++) {
-                            coordinate = nitfIGEOLO.substr(i * COORD_LENGTH, COORD_LENGTH);
-                            rawSubLat = coordinate.substr(0, LAT_LENGTH);
-                            rawSubLon = coordinate.substr(LAT_LENGTH, LON_LENGTH);
-                            formattedLat = rawSubLat.substr(0, 2) + ' ' + rawSubLat.substr(2, 2) + ' ' + rawSubLat.substr(4, 3);
-                            formattedLon = rawSubLon.substr(0, 3) + ' ' + rawSubLon.substr(3, 2) + ' ' + rawSubLon.substr(5, 3);
-                            myNewInstance.sourceCoordinates.push({
-                                sourceLongitude: formattedLon,
-                                sourceLatitude: formattedLat,
-                                sourceHeight: '0'
-                            });
+                        rawUtmZone = this.executionContext.transformed.UTMZone;
+                        if (rawUtmZone.length === 3) {
+                            zoneLength = 2;
                         }
-                        return [4, this.callService(myNewInstance)];
+                        else if (rawUtmZone.length === 2) {
+                            zoneLength = 1;
+                        }
+                        else {
+                            console.log('ERROR:hrteCoordinateTransform.fx: UTMZone field malformed');
+                            return [2, reject(false)];
+                        }
+                        utmHemisphere_1 = rawUtmZone.substr(rawUtmZone.length - 1, 1);
+                        utmZone_1 = rawUtmZone.substr(0, zoneLength);
+                        myNewInstance_1 = new CoordinateConversionRequest();
+                        footprint = this.executionContext.transformed.Footprint;
+                        footprint = footprint.replace(/[{()}]/g, '');
+                        footprint = footprint.replace('POLYGON', '');
+                        points = footprint.split(',');
+                        pointCount_1 = 1;
+                        points.forEach(function (point) {
+                            if (point && pointCount_1 <= 4) {
+                                var coords = point.split(' ');
+                                var counter_1 = 0;
+                                var parsedEasting_1;
+                                var parsedNorthing_1;
+                                coords.forEach(function (coord) {
+                                    if (coord) {
+                                        if (counter_1 === 0) {
+                                            parsedEasting_1 = +coord;
+                                        }
+                                        if (counter_1 === 1) {
+                                            parsedNorthing_1 = +coord;
+                                        }
+                                        counter_1++;
+                                    }
+                                });
+                                myNewInstance_1.sourceCoordinates.push({
+                                    sourceEasting: parsedEasting_1,
+                                    sourceNorthing: parsedNorthing_1,
+                                    sourceHemisphere: utmHemisphere_1,
+                                    sourceZoneData: utmZone_1
+                                });
+                                pointCount_1++;
+                            }
+                        });
+                        if (utmHemisphere_1 === 'N') {
+                            nMin = myNewInstance_1.sourceCoordinates[0].sourceNorthing;
+                            for (i = 1; i <= 3; i++) {
+                                if (myNewInstance_1.sourceCoordinates[i].sourceNorthing < nMin) {
+                                    nMin = myNewInstance_1.sourceCoordinates[i].sourceNorthing;
+                                }
+                            }
+                            for (i = 0; i <= 3; i++) {
+                                if (myNewInstance_1.sourceCoordinates[i].sourceNorthing > (5000000 + nMin)) {
+                                    myNewInstance_1.sourceCoordinates[i].sourceHemisphere = 'S';
+                                }
+                                else {
+                                    myNewInstance_1.sourceCoordinates[i].sourceHemisphere = 'N';
+                                }
+                            }
+                        }
+                        return [4, this.callService(myNewInstance_1)];
                     case 1:
                         body = _a.sent();
                         if (body && body.Coordinates) {
                             this.executionContext.transformed.Metadata.COORD_GEOJSON = _super.prototype.toGeoJSON.call(this, body.Coordinates || []);
                             this.executionContext.transformed.Metadata.COORD_WKT = _super.prototype.toWkt.call(this, body.Coordinates || []);
-                            this.executionContext.transformed.Metadata.COORD_TYPE = 'G';
+                            this.executionContext.transformed.Metadata.COORD_TYPE = 'H';
                             return [2, resolve(true)];
                         }
-                        _a.label = 2;
-                    case 2: return [2, reject(false)];
-                    case 3:
+                        return [3, 3];
+                    case 2:
                         err_1 = _a.sent();
-                        common_1.ErrorHandler.logError("geographicCoordinateTransform.fx.error:", err_1);
+                        common_1.ErrorHandler.logError("hrteCoordinateTransform.fx.error:", err_1);
                         return [2, reject(false)];
-                    case 4: return [2];
+                    case 3: return [2];
                 }
             });
         }); });
         return result;
     };
-    GeographicCoordinateTransform.prototype.callService = function (conversionRequest) {
+    HRTECoordinateTransform.prototype.callService = function (conversionRequest) {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
             var response, records, err_2;
@@ -116,7 +158,7 @@ var GeographicCoordinateTransform = (function (_super) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
                         if (!this._servicePath) {
-                            return [2, reject('Invalid Service Path for Geographic Coordinate Service')];
+                            return [2, reject('Invalid Service Path for HRTE Coordinate Service')];
                         }
                         return [4, rp.post({
                                 headers: { 'content-type': 'application/json' },
@@ -129,7 +171,7 @@ var GeographicCoordinateTransform = (function (_super) {
                         return [2, resolve(records)];
                     case 2:
                         err_2 = _a.sent();
-                        common_1.ErrorHandler.logError('geographicCoordinateTransform.callService.error:', err_2);
+                        common_1.ErrorHandler.logError('hrteCoordinateTransform.callService.error:', err_2);
                         return [2, reject(false)];
                     case 3: return [2];
                 }
@@ -137,9 +179,9 @@ var GeographicCoordinateTransform = (function (_super) {
         }); });
         return result;
     };
-    return GeographicCoordinateTransform;
+    return HRTECoordinateTransform;
 }(_1.BaseTransform));
-exports.GeographicCoordinateTransform = GeographicCoordinateTransform;
+exports.HRTECoordinateTransform = HRTECoordinateTransform;
 var CoordinateConversionRequest = (function () {
     function CoordinateConversionRequest() {
         this.lonRange = 0;
@@ -147,8 +189,9 @@ var CoordinateConversionRequest = (function () {
         this.signHemisphere = 0;
         this.geodeiticUnits = 2;
         this.sourceDatum = 'WGE';
-        this.sourceCoordinateType = 10;
+        this.sourceCoordinateType = 34;
         this.sourceHeightType = 0;
+        this.sourceZone = false;
         this.targetDatum = 'WGE';
         this.targetCoordinateType = 10;
         this.targetHeightType = 0;
@@ -159,9 +202,10 @@ var CoordinateConversionRequest = (function () {
 }());
 var SourceCoordinate = (function () {
     function SourceCoordinate() {
-        this.sourceLongitude = '';
-        this.sourceLatitude = '';
-        this.sourceHeight = '0';
+        this.sourceEasting = '';
+        this.sourceNorthing = '';
+        this.sourceHemisphere = '';
+        this.sourceZoneData = '';
     }
     return SourceCoordinate;
 }());

@@ -11,3 +11,5 @@ __export(require("./geographicCoordinateTransform"));
 __export(require("./UTMMGRSCoordinateTransform"));
 __export(require("./UTMNCoordinateTransform"));
 __export(require("./UTMSCoordinateTransform"));
+__export(require("./hrteCoordinateTransform"));
+__export(require("./coordinateTransform"));

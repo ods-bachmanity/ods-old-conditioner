@@ -86,7 +86,7 @@ var ExecutionContext = (function () {
                                 return [2, resolve(this._definition)];
                             case 2:
                                 err_1 = _b.sent();
-                                console.error("ExecutionContext.resolveDefinition.error: " + err_1);
+                                common_1.ErrorHandler.logError("ExecutionContext.resolveDefinition.error:", err_1);
                                 return [2, reject("Error retrieving Definition " + this.definitionId)];
                             case 3: return [2];
                         }
@@ -164,7 +164,7 @@ var ExecutionContext = (function () {
                         return [2, resolve(Object.assign({}, this.raw))];
                     case 4:
                         err_2 = _a.sent();
-                        console.error("ExecutionContext.compose().error: " + err_2);
+                        common_1.ErrorHandler.logError("ExecutionContext.compose().error:", err_2);
                         errorSchema = common_1.ErrorHandler.errorResponse("ExecutionContext.compose().error", err_2.httpStatus ? err_2.httpStatus : 500, (err_2.message ? err_2.message : "Error in ExecutionContext"), err_2);
                         return [2, reject(errorSchema)];
                     case 5: return [2];
@@ -230,8 +230,7 @@ var ExecutionContext = (function () {
                     case 5: return [2, resolve(Object.assign({}, this.transformed))];
                     case 6:
                         err_3 = _a.sent();
-                        console.error("ExecutionContext.schema().error:");
-                        console.error("" + JSON.stringify(err_3, null, 2));
+                        common_1.ErrorHandler.logError("ExecutionContext.schema().error:", err_3);
                         errorSchema = common_1.ErrorHandler.errorResponse("ExecutionContext.schema().error", err_3.httpStatus ? err_3.httpStatus : 500, (err_3.message ? err_3.message : "Error in ExecutionContext"), err_3);
                         return [2, reject(errorSchema)];
                     case 7: return [2];
@@ -269,7 +268,7 @@ var ExecutionContext = (function () {
                         return [2, resolve(this.mapped)];
                     case 3:
                         err_4 = _a.sent();
-                        console.error("ExecutionContext.map().error: " + err_4);
+                        common_1.ErrorHandler.logError("ExecutionContext.map().error:", err_4);
                         errorSchema = common_1.ErrorHandler.errorResponse("ExecutionContext.map().error", err_4.httpStatus ? err_4.httpStatus : 500, (err_4.message ? err_4.message : "Error in ExecutionContext"), err_4);
                         return [2, reject(errorSchema)];
                     case 4: return [2];
@@ -310,7 +309,7 @@ var ExecutionContext = (function () {
                     case 5: return [3, 7];
                     case 6:
                         err_5 = _a.sent();
-                        console.error("ExecutionContext.act().error: " + err_5);
+                        common_1.ErrorHandler.logError("ExecutionContext.act().error:", err_5);
                         errorSchema = common_1.ErrorHandler.errorResponse("ExecutionContext.act().error", err_5.httpStatus ? err_5.httpStatus : 500, (err_5.message ? err_5.message : "Error in ExecutionContext"), err_5);
                         return [2, reject(errorSchema)];
                     case 7: return [2];
@@ -329,7 +328,7 @@ var ExecutionContext = (function () {
                 return resolve(response);
             }
             catch (err) {
-                console.error("ExecutionContext.respond.error: " + err);
+                common_1.ErrorHandler.logError("ExecutionContext.respond.error:", err);
                 return reject(response);
             }
         });

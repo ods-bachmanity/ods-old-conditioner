@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var src_1 = require("../src");
+var common_1 = require("../common");
 var DefinitionRoute = (function () {
     function DefinitionRoute(server) {
         this.server = server;
@@ -65,7 +66,7 @@ var DefinitionRoute = (function () {
                         return [2, next()];
                     case 2:
                         err_1 = _a.sent();
-                        console.error("DefinitionRoute.init.get(" + path + ").error: " + JSON.stringify(err_1, null, 2));
+                        common_1.ErrorHandler.logError("DefinitionRoute.init.get(" + path + ").error:", err_1);
                         res.contentType = 'application/json';
                         res.header('Content-Type', 'application/json');
                         res.send(err_1.httpStatus ? err_1.httpStatus : 500, err_1);

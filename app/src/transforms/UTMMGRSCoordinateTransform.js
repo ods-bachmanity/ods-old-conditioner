@@ -45,7 +45,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var baseTransform_1 = require("./baseTransform");
+var _1 = require("./");
+var common_1 = require("../../common");
 var rp = require('request-promise');
 var UTMMGRSCoordinateTransform = (function (_super) {
     __extends(UTMMGRSCoordinateTransform, _super);
@@ -90,7 +91,7 @@ var UTMMGRSCoordinateTransform = (function (_super) {
                     case 2: return [2, reject(false)];
                     case 3:
                         err_1 = _a.sent();
-                        console.error("ERROR:utmmgrs_coordinateTransform.fx:" + err_1);
+                        common_1.ErrorHandler.logError("utmmgrsCoordinateTransform.fx.error:", err_1);
                         return [2, reject(false)];
                     case 4: return [2];
                 }
@@ -120,9 +121,8 @@ var UTMMGRSCoordinateTransform = (function (_super) {
                         return [2, resolve(records)];
                     case 2:
                         err_2 = _a.sent();
-                        console.error('ERROR:utmmgrsCoordinateTransform.callService');
-                        console.error(err_2);
-                        return [2, reject(null)];
+                        common_1.ErrorHandler.logError('utmmgrsCoordinateTransform.callService.error:', err_2);
+                        return [2, reject(false)];
                     case 3: return [2];
                 }
             });
@@ -130,7 +130,7 @@ var UTMMGRSCoordinateTransform = (function (_super) {
         return result;
     };
     return UTMMGRSCoordinateTransform;
-}(baseTransform_1.BaseTransform));
+}(_1.BaseTransform));
 exports.UTMMGRSCoordinateTransform = UTMMGRSCoordinateTransform;
 var CoordinateConversionRequest = (function () {
     function CoordinateConversionRequest() {
