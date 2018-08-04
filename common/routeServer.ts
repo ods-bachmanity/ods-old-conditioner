@@ -8,7 +8,7 @@ export class RouteServer {
     public init(): any {
 
         let options = {};
-        if (!config.production) {
+        if (!process.env.PRODUCTION) {
             options = {
                 formatters: {
                     'text/html': function (req, res, body, next) {
@@ -23,7 +23,7 @@ export class RouteServer {
         this.restifyServer.use(restify.plugins.queryParser())
         this.restifyServer.use(restify.plugins.bodyParser())
         
-        if (!config.production) {
+        if (!process.env.PRODUCTION) {
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         }
 
@@ -33,7 +33,7 @@ export class RouteServer {
     public start() {
 
         let thePort = config.apiPort || config.PORT
-        if (config.production === true) {
+        if (process.env.PRODUCTION && process.env.production === 'true') {
             thePort = process.env.PORT || thePort
         }
         

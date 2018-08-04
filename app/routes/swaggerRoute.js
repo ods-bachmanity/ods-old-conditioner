@@ -60,8 +60,6 @@ var SwaggerRoute = (function () {
                     case 2:
                         err_1 = _a.sent();
                         common_2.ErrorHandler.logError("SwaggerRoute.init.get(" + path + ").error:", err_1);
-                        res.contentType = 'application/json';
-                        res.header('Content-Type', 'application/json');
                         res.send(500, err_1);
                         return [2, next()];
                     case 3: return [2];

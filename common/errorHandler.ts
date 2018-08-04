@@ -1,93 +1,105 @@
-import * as config from 'config'
-import { ErrorSchema } from '../src/schemas'
+import { ConditionerResponseSchema } from '../src/schemas'
 
 export class ErrorHandler {
-
-    private _defaultMessage: string = `Error Occurred. Logs on Server.`
 
     constructor (private server) {}
 
     init () {
 
         this.server.on('InternalError', (req, res, err, next) => {
-            console.error(`Internal Error: ${err}`)
-            const error = new ErrorSchema()
-            error.message = `Internal Error: ${err}`
-            res.send(error.httpStatus, this.errorMessage(error.message))
+            ErrorHandler.logError(`Internal Error`, err)
+            res.contentType = 'application/json'
+            res.header('Content-Type', 'application/json')
+            res.send(500, ErrorHandler.internalErrorResponse(err))
             return next()
         })
 
         this.server.on('InternalServerError', (req, res, err, next) => {
-            console.error(`Internal Server Error: ${err}`)
-            const error = new ErrorSchema()
-            error.message = `Internal Server Error: ${err}`
-            res.send(error.httpStatus, this.errorMessage(error.message))
+            ErrorHandler.logError(`Internal Server Error`, err)
+            res.contentType = 'application/json'
+            res.header('Content-Type', 'application/json')
+            res.send(500, ErrorHandler.internalErrorResponse(err))
             return next()
         })
 
         this.server.on('restifyError', (req, res, err, next) => {
-            console.error(`Restify Error: ${err}`)
-            const error = new ErrorSchema()
-            error.message = `Restify Error: ${err}`
-            res.send(error.httpStatus, this.errorMessage(error.message))
+            ErrorHandler.logError(`Restify Error`, err)
+            res.contentType = 'application/json'
+            res.header('Content-Type', 'application/json')
+            res.send(500, ErrorHandler.internalErrorResponse(err))
             return next()
         })
 
         this.server.on('uncaughtException', (req, res, err, next) => {
-            console.error(`Uncaught Exception: ${err}`)
-            const error = new ErrorSchema()
-            error.message = `Uncaught Exception: ${err}`
-            res.send(error.httpStatus, this.errorMessage(error.message))
+            ErrorHandler.logError(`Uncaught Exception`, err)
+            res.contentType = 'application/json'
+            res.header('Content-Type', 'application/json')
+            res.send(500, ErrorHandler.internalErrorResponse(err))
             return next()
         })
-
-    }
-
-    public static errorResponse(source: string, httpStatus: number, message: string, err: any): ErrorSchema {
-
-        const errorSchema = new ErrorSchema()
-        errorSchema.debug = (!config.production ? source : null)
-        errorSchema.httpStatus = httpStatus || 500
-        errorSchema.message = message || (err.message ? err.message : 'Error')
-        errorSchema.error = (!config.production ? err : null)
-        return errorSchema
 
     }
 
     public static logError(source: string, err: any) {
 
+        const now = new Date()
+        const timeString = `${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getUTCSeconds()}:${now.getUTCMilliseconds()}`
+        console.error(`${timeString}:> ERROR IN ${source} ${this.errorText(err)}`)
+        return
+
+    }
+
+    public static errorText(err: any) {
+
         if ((typeof err === "object") && (err !== null)) {
-            return console.error(`ERROR: ${source}: ${JSON.stringify(err, null, 1)}`)
+            if (err.ods_errors && err.ods_errors.length > 0) {
+                return `${err.ods_errors.toString()}`
+            }
+            if (err.message) return err.message
+            return `${JSON.stringify(err)}`
         }
-        console.error(`ERROR: ${source}: ${err}`)
+        return `${err}`
 
     }
 
-    private static slimError(err: any): any {
+    public static errorResponse(httpStatusCode: number, fileUri: string, fingerprint: string, version: string, err: any, ods_warnings: Array<any>, ods_definition: string, data: any):ConditionerResponseSchema {
 
-        if (typeof(err) !== 'object') return {
-            message: err
+        if (err.ods_code) {
+            err.ods_code = -1
+            if (fileUri && !err.fileUri) err.fileUri = fileUri
+            if (fingerprint && !err.fingerprint) err.fingerprint = fingerprint
+            if (version && !err.version) err.version = version
+            if (ods_warnings && ods_warnings.length > 0) {
+                err.ods_warnings.push(ods_warnings)
+            }
+            if (ods_definition && !err.ods_definition) err.ods_definition = ods_definition
+            if (data && !err.data) err.data = data
+            return JSON.parse(JSON.stringify(err))
         }
+        const result = new ConditionerResponseSchema()
+        result.ods_code = -1
+        result.httpStatus = httpStatusCode
+        result.fileUri = fileUri || null
+        result.fingerprint = fingerprint || null
+        result.version = version || null
+        result.ods_errors = [ErrorHandler.errorText(err)]
+        result.ods_warnings = ods_warnings || []
+        result.ods_definition = ods_definition || null
+        result.data = data || {}
 
-        if (err.message) {
-            return { message: err.message }
-        }
-
-        return err
-
-    }
-
-    private errorMessage(err: any) {
-
-        if (config.production) {
-            return this._defaultMessage
-        }
-        let result = this._defaultMessage
-        if (err) {
-            result = err.message ? err.message : err.toString()
-        }
         return result
 
     }
+
+    private static internalErrorResponse(err) {
+        return {
+            ods_code: -1,
+            ods_errors: [ErrorHandler.errorText(err)],
+            ods_warnings: [],
+            ods_definition: null,
+            data: {}
+        }
+    }
+
 
 }

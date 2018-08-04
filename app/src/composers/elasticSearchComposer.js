@@ -57,7 +57,7 @@ var ElasticSearchComposer = (function (_super) {
     ElasticSearchComposer.prototype.fx = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var url, uname, pw, payload, endpoint, error, response, body, error, error, error, error, fileObject, err_1, error;
+            var url, uname, pw, payload, endpoint, handleError, response, body, handleError, handleError, handleError, handleError, fileObject, err_1, handleError;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -85,21 +85,27 @@ var ElasticSearchComposer = (function (_super) {
                                 'Content-Type': 'application/json'
                             }
                         };
-                        if (!this.executionContext || !this.executionContext.parameters || !this.executionContext.parameters.fileuri) {
-                            error = common_1.ErrorHandler.errorResponse("ElasticSearchComposer.fx().try", 400, 'Missing fileuri in Request body', null);
-                            return [2, reject(error)];
+                        if (!this.executionContext || !this.executionContext.parameters
+                            || !this.executionContext.parameters.fileuri
+                            || !this.executionContext.parameters.fingerprint
+                            || !this.executionContext.parameters.version) {
+                            handleError = common_1.ErrorHandler.errorResponse(400, this.executionContext.getParameterValue('fileuri'), this.executionContext.getParameterValue('fingerprint'), this.executionContext.getParameterValue('version'), "Missing critical parameter in Request body", this.executionContext.warnings, this.executionContext.definition.id, {});
+                            common_1.ErrorHandler.logError("elasticSearchComposer.fx()", handleError);
+                            return [2, reject(handleError)];
                         }
                         return [4, rp(endpoint)];
                     case 1:
                         response = _a.sent();
                         body = JSON.parse(response);
                         if (body.httpStatus === 404) {
-                            error = common_1.ErrorHandler.errorResponse("ElasticSearchComposer.fx().try.response", 404, 'No record returned for request', null);
-                            return [2, reject(error)];
+                            handleError = common_1.ErrorHandler.errorResponse(404, this.executionContext.getParameterValue('fileuri'), this.executionContext.getParameterValue('fingerprint'), this.executionContext.getParameterValue('version'), "No record returned for request", this.executionContext.warnings, this.executionContext.definition.id, {});
+                            common_1.ErrorHandler.logError("elasticSearchComposer.fx()", handleError);
+                            return [2, reject(handleError)];
                         }
                         if (body.code && body.code !== 0) {
-                            error = common_1.ErrorHandler.errorResponse("ElasticSearchComposer.fx().try.response", body.httpStatus || 500, 'Error retrieving record for request', null);
-                            return [2, reject(error)];
+                            handleError = common_1.ErrorHandler.errorResponse(500, this.executionContext.getParameterValue('fileuri'), this.executionContext.getParameterValue('fingerprint'), this.executionContext.getParameterValue('version'), "Error retrieving record for request", this.executionContext.warnings, this.executionContext.definition.id, {});
+                            common_1.ErrorHandler.logError("elasticSearchComposer.fx():Error retrieving record for request:\n " + JSON.stringify(body, null, 1), handleError);
+                            return [2, reject(handleError)];
                         }
                         if (!body
                             || !body.hits
@@ -107,20 +113,22 @@ var ElasticSearchComposer = (function (_super) {
                             || !body.hits.hits[0]
                             || !body.hits.hits[0]._source
                             || !body.hits.hits[0]._source.rawheader) {
-                            error = common_1.ErrorHandler.errorResponse("ElasticSearchComposer.fx().try.response", body.httpStatus || 500, 'Invalid Record Format returned from Elastic Search', null);
-                            return [2, reject(error)];
+                            handleError = common_1.ErrorHandler.errorResponse(500, this.executionContext.getParameterValue('fileuri'), this.executionContext.getParameterValue('fingerprint'), this.executionContext.getParameterValue('version'), "Invalid Record Format returned from Elastic Search", this.executionContext.warnings, this.executionContext.definition.id, {});
+                            common_1.ErrorHandler.logError("elasticSearchComposer.fx():Invalid Record Format returned from Elastic Search:\n " + JSON.stringify(body, null, 1) + " ", handleError);
+                            return [2, reject(handleError)];
                         }
                         if (body.hits.total !== 1) {
-                            error = common_1.ErrorHandler.errorResponse("ElasticSearchComposer.fx().try.response", body.httpStatus || 500, 'Invalid number of responses from Elastic Search returned', null);
-                            return [2, reject(error)];
+                            handleError = common_1.ErrorHandler.errorResponse(500, this.executionContext.getParameterValue('fileuri'), this.executionContext.getParameterValue('fingerprint'), this.executionContext.getParameterValue('version'), "Invalid number of responses from Elastic Search returned", this.executionContext.warnings, this.executionContext.definition.id, {});
+                            common_1.ErrorHandler.logError("elasticSearchComposer.fx():Invalid number of respones from Elastic Search returned:\n " + JSON.stringify(body, null, 1), handleError);
+                            return [2, reject(handleError)];
                         }
                         fileObject = JSON.parse(body.hits.hits[0]._source.rawheader);
                         return [2, resolve(fileObject)];
                     case 2:
                         err_1 = _a.sent();
-                        common_1.ErrorHandler.logError("ElasticSearchComposer.fx.error:", err_1);
-                        error = common_1.ErrorHandler.errorResponse("ElasticSearchComposer.fx()", 500, err_1.message || err_1.error ? err_1.message || err_1.error : "Error", err_1);
-                        return [2, reject(error)];
+                        handleError = common_1.ErrorHandler.errorResponse(500, this.executionContext.getParameterValue('fileuri'), this.executionContext.getParameterValue('fingerprint'), this.executionContext.getParameterValue('version'), "Error executing elasticSearchComposer.fx():", this.executionContext.warnings, this.executionContext.definition.id, {});
+                        common_1.ErrorHandler.logError("elasticSearchComposer.fx()", handleError);
+                        return [2, reject(handleError)];
                     case 3: return [2];
                 }
             });

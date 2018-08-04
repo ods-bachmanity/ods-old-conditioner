@@ -5,6 +5,7 @@ var restify = require("restify");
 var fs = require("fs");
 var path = require("path");
 var _1 = require(".");
+var common_1 = require("../common");
 var Router = (function () {
     function Router(server, errorHandler) {
         this.server = server;
@@ -42,7 +43,7 @@ var Router = (function () {
             console.error("Router not found: " + req.url);
             res.contentType = 'application/json';
             res.header('Content-Type', 'application/json');
-            res.send(404, { code: -1, httpStatus: 404, message: "Unable to locate resource: " + req.url });
+            res.send(404, common_1.ErrorHandler.errorResponse(404, req.body.fileuri, req.body.fingerprint, req.body.version, "Router not found: " + req.url, [], req.params.definitionId, {}));
         });
     };
     return Router;

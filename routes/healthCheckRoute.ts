@@ -20,9 +20,7 @@ export class HealthCheckRoute {
             }
             catch (err) {
                 ErrorHandler.logError(`HealthCheckRoute.init.get(${path}).error:`, err)
-                res.contentType = 'application/json'
-                res.header('Content-Type', 'application/json')
-                
+
                 res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()
             }

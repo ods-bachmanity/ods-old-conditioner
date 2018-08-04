@@ -1,5 +1,5 @@
 import { ErrorHandler } from '../common'
-import { ConditionerResponseSchema, ConditionerExecutionSchema } from './schemas'
+import { ConditionerResponseSchema } from './schemas'
 import { ExecutionContext } from './';
 
 export class ConditionerService {
@@ -12,35 +12,18 @@ export class ConditionerService {
 
             try {
 
-                const executionContext: ExecutionContext = new ExecutionContext(definitionId)
-                const definition = await executionContext.initialize()
+                const executionContext: ExecutionContext = new ExecutionContext(definitionId, requestContext)
     
-                if (definition.parameters) {
-                    definition.parameters.forEach((item) => {
-                        executionContext.addParameter(item.key, item.value, requestContext)
-                    })
-                }
-    
-                const activity = new ConditionerExecutionSchema()
+                const activity = executionContext.execute()
 
-                activity.raw = await executionContext.compose()
-
-                activity.transformed = await executionContext.schema()
-
-                activity.map = await executionContext.map()
-
-                activity.actions = await executionContext.act()
-                
-                const response = await executionContext.respond()
-
-                return resolve(response)
+                return resolve(activity)
 
             }
             catch (err) {
-                ErrorHandler.logError(`ConditionerService.execute(${definitionId}).error:`, err)
-                const errorSchema = ErrorHandler.errorResponse(`ConditionerService.execute(${definitionId})`,
-                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ConditionerService`), err)
-                return reject(errorSchema)
+                const handleError = ErrorHandler.errorResponse(400, requestContext.body.fileuri, requestContext.body.fingerprint,
+                    requestContext.body.version, err, [], definitionId, {})
+                ErrorHandler.logError(`ConditionerService.execute(${definitionId}).error:`, handleError)
+                return reject(handleError)
             }
 
         })

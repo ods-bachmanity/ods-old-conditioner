@@ -1,4 +1,4 @@
-import { FieldSchema, ErrorSchema, TransformDefSchema } from './schemas'
+import { FieldSchema, TransformDefSchema } from './schemas'
 import { ExecutionContext } from './'
 import { ErrorHandler, Utilities } from '../common'
 import { isNullOrUndefined } from 'util';
@@ -104,10 +104,13 @@ export class TaskWorker {
                 
             }
             catch (err) {
-                ErrorHandler.logError(`TaskWorker.execute().error:`, err)
-                return reject(err)
+                const handleError = ErrorHandler.errorResponse(500,this.executionContext.getParameterValue('fileuri'),
+                this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), err, 
+                this.executionContext.warnings,this.executionContext.definition.id,{})
+
+                ErrorHandler.logError(`TaskWorker.execute().error:`, handleError)
+                return reject(handleError)
             }
-            return resolve()
 
         })
 

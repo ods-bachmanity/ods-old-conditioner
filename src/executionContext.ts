@@ -17,12 +17,14 @@ export class ExecutionContext {
     public data: any = {}
     public actions: any = {}
     public response: any = {}
+    public warnings: Array<string> = []
+    public errors: Array<string> = []
 
     private static _definitionService = new DefinitionService()
     private _definition: DefinitionSchema = null
     private _utilities = new Utilities()
 
-    public constructor(private definitionId: string) {
+    public constructor(private definitionId: string, private requestContext: any) {
         // GET DEFINITION FOR EXECUTION
     }
 
@@ -30,9 +32,9 @@ export class ExecutionContext {
         return this._definition
     }
 
-    private async resolveDefinition() {
+    private async resolveDefinition(): Promise<DefinitionSchema> {
 
-        const result = new Promise(async (resolve, reject) => {
+        const result: Promise<DefinitionSchema> = new Promise(async (resolve, reject) => {
 
             try {
 
@@ -46,8 +48,10 @@ export class ExecutionContext {
     
             }
             catch (err) {
-                ErrorHandler.logError(`ExecutionContext.resolveDefinition.error:`, err)
-                return reject(`Error retrieving Definition ${this.definitionId}`)
+                const handleError = ErrorHandler.errorResponse(400,this.requestContext.body.fileuri,
+                this.requestContext.body.fingerprint, this.requestContext.body.version, err, this.warnings, this.definitionId, {})
+                ErrorHandler.logError(`ExecutionContext.resolveDefinition.error:`, handleError)
+                return reject(handleError)
             }
 
         })
@@ -56,16 +60,63 @@ export class ExecutionContext {
 
     }
 
-    public async initialize(): Promise<any> {
+    private async initialize(): Promise<any> {
 
-        return this.resolveDefinition()
+        const result = new Promise(async(resolve, reject) => {
+
+            try {
+                const definition = await this.resolveDefinition()
+    
+                if (definition.parameters) {
+                    definition.parameters.forEach((item) => {
+                        this.addParameter(item.key, item.value, this.requestContext)
+                    })
+                }
+        
+                return resolve(true)
+            }
+            catch (err) {
+                const handleError = ErrorHandler.errorResponse(500,this.requestContext.body.fileuri,
+                    this.requestContext.body.fingerprint, this.requestContext.body.version, err, this.warnings,this.definitionId,{})
+                ErrorHandler.logError(`ExecutionContext.initialize.error:`, handleError)
+                return reject(handleError)
+            }
+        })
+
+        return result
+
 
     }
 
-    public getParameter(key: string) {
+    public async execute(): Promise<any> {
+
+        const result = new Promise(async(resolve, reject) => {
+
+            try {
+                await this.initialize()
+                await this.compose()
+                await this.schema()
+                await this.map()
+                await this.act()
+
+                const response = await this.respond()
+                return resolve(response)
+            }
+            catch (err) {
+                const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
+                this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
+                return reject(handleError)
+            }
+
+        })
+
+        return result
+    }
+
+    public getParameterValue(key: string) {
 
         if (!this._definition) {
-            throw new Error(`Attempted to execute getParameter method without initializing ExecutionContext`)
+            return this.requestContext.body[key]
         }
         const result = this.parameters[key]
         return result
@@ -97,7 +148,7 @@ export class ExecutionContext {
         // console.log(`Setting ${key} to ${result}`)
     }
 
-    public compose(): Promise<any> {
+    private compose(): Promise<any> {
 
         const result = new Promise(async (resolve, reject) => {
 
@@ -125,21 +176,21 @@ export class ExecutionContext {
 
                 this.raw = _.merge({}, ...documents)
                 this.transformed = _.cloneDeep(this.raw)
-                return resolve(Object.assign({}, this.raw))
+                return resolve(true)
 
             }
             catch (err) {
-                ErrorHandler.logError(`ExecutionContext.compose().error:`, err)
-                const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.compose().error`,
-                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
-                return reject(errorSchema)
+                const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
+                this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
+                ErrorHandler.logError(`ExecutionContext.compose().error:`, handleError)
+                return reject(handleError)
             }
         })
 
         return result
     }
 
-    public schema(): Promise<any> {
+    private schema(): Promise<any> {
 
         const result = new Promise(async (resolve, reject) => {
 
@@ -171,20 +222,20 @@ export class ExecutionContext {
                         currentOrdinal++    
                     }
                 }
-                return resolve(Object.assign({}, this.transformed))
+                return resolve(true)
             }
             catch (err) {
-                ErrorHandler.logError(`ExecutionContext.schema().error:`, err)
-                const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.schema().error`,
-                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
-                return reject(errorSchema)
+                const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
+                this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
+                ErrorHandler.logError(`ExecutionContext.schema().error:`, handleError)
+                return reject(handleError)
             }
         })
 
         return result
     }
 
-    public map(): Promise<any> {
+    private map(): Promise<any> {
 
         const result = new Promise(async (resolve, reject) => {
 
@@ -209,14 +260,14 @@ export class ExecutionContext {
                 }
                 this.mapped = Object.assign({}, mapObject)
 
-                return resolve(this.mapped)
+                return resolve(true)
 
             }
             catch (err) {
-                ErrorHandler.logError(`ExecutionContext.map().error:`, err)
-                const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.map().error`,
-                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
-                return reject(errorSchema)
+                const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
+                this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
+                ErrorHandler.logError(`ExecutionContext.map().error:`, handleError)
+                return reject(handleError)
             }
 
         })
@@ -225,7 +276,7 @@ export class ExecutionContext {
 
     }
 
-    public act(): Promise<any> {
+    private act(): Promise<any> {
 
         const result = new Promise(async (resolve, reject) => {
 
@@ -247,19 +298,19 @@ export class ExecutionContext {
                     const responses = await Promise.all(tasks)
                     this.actions = _.merge({}, ...responses)
                     
-                    return resolve(Object.assign({}, this.actions))
+                    return resolve(true)
 
                 } else {
 
-                    return resolve({})
+                    return resolve(false)
 
                 }
             }
             catch (err) {
-                ErrorHandler.logError(`ExecutionContext.act().error:`, err)
-                const errorSchema = ErrorHandler.errorResponse(`ExecutionContext.act().error`,
-                    err.httpStatus ? err.httpStatus : 500, (err.message ? err.message : `Error in ExecutionContext`), err)
-                return reject(errorSchema)
+                const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
+                this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
+                ErrorHandler.logError(`ExecutionContext.act().error:`, handleError)
+                return reject(handleError)
             }
 
         })
@@ -268,30 +319,29 @@ export class ExecutionContext {
 
     }
 
-    public respond(): Promise<any> {
+    private respond(): Promise<any> {
 
         const result = new Promise((resolve, reject) => {
 
             const response = new ConditionerResponseSchema()
 
             try {
-                //response.fileUri = activity.transformed.FileUri
-                //response.fingerprint = activity.transformed.FingerPrint
+                response.fileUri = this.getParameterValue('fileuri')
+                response.fingerprint = this.getParameterValue('fingerprint')
                 response.version = this.parameters['version']
-                //response.contentId = activity.transformed.FingerPrint
                 response.data = JSON.parse(JSON.stringify(this.mapped))
-                //response.ods_code = activity.code
-                //response.ods_errors = []
-                //response.ods_definition = executionContext.definition.id
-                //response.emc = Object.assign({}, activity.actions)
-                // response.transformed = activity.transformed
+                response.ods_code = 0
+                response.ods_errors = JSON.parse(JSON.stringify(this.errors))
+                response.ods_definition = this.definitionId
                 
                 return resolve(response)
                 
             }
             catch (err) {
-                ErrorHandler.logError(`ExecutionContext.respond.error:`, err)
-                return reject(response)
+                const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
+                this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
+                ErrorHandler.logError(`ExecutionContext.respond.error:`, handleError)
+                return reject(handleError)
             }    
 
         })

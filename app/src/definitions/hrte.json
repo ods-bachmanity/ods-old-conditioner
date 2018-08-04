@@ -3,8 +3,8 @@
     "description": "Handle all HRTE files",
     "parameters": [
         {"key": "fileuri", "value": "req.body.fileuri"},
-        {"key": "fingerprint", "value": "req.body.fingerprint||0"},
-        {"key": "version", "value": "req.body.version||0"},
+        {"key": "fingerprint", "value": "req.body.fingerprint"},
+        {"key": "version", "value": "req.body.version"},
         {"key": "username", "value": ".env.ELASTICUID"},
         {"key": "password", "value": ".env.ELASTICPWD"},
         {"key": "catalog_endpoint_search", "value": "req.body.catalog_endpoint_search||.env.EMCCATALOGSERVICEURLGET"},

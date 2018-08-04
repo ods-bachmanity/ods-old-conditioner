@@ -65,7 +65,7 @@ export class Router {
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             
-            res.send(404, {code: -1, httpStatus: 404, message: `Unable to locate resource: ${req.url}`})
+            res.send(404, ErrorHandler.errorResponse(404,req.body.fileuri,req.body.fingerprint,req.body.version,`Router not found: ${req.url}`,[],req.params.definitionId,{}))
         })
     }
 

@@ -44,33 +44,33 @@ var ConditionerRoute = (function () {
     ConditionerRoute.prototype.init = function (path) {
         var _this = this;
         this.server.post(path, function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-            var definitionId, result, err_1;
+            var definitionId, result, err_1, errorResponse;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
+                        definitionId = '';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        res.contentType = 'application/json';
+                        res.header('Content-Type', 'application/json');
                         if (!req.params || !req.params.definitionId) {
-                            res.contentType = 'application/json';
-                            res.header('Content-Type', 'application/json');
-                            res.send(400, 'Bad Request');
+                            res.send(400, common_1.ErrorHandler.errorResponse(400, req.body.fileuri, req.body.fingerprint, req.body.version, 'Invalid Definition Id', [], req.params.definition, {}));
                             return [2, next()];
                         }
                         definitionId = req.params.definitionId;
                         return [4, this.executeRoute(definitionId, req)];
-                    case 1:
+                    case 2:
                         result = _a.sent();
-                        res.contentType = 'application/json';
-                        res.header('Content-Type', 'application/json');
                         res.send(200, result);
                         return [2, next()];
-                    case 2:
+                    case 3:
                         err_1 = _a.sent();
                         common_1.ErrorHandler.logError("ConditionerRoute.init.post(" + path + ").error:", err_1);
-                        res.contentType = 'application/json';
-                        res.header('Content-Type', 'application/json');
-                        res.send(err_1.httpStatus ? err_1.httpStatus : 500, err_1);
+                        errorResponse = common_1.ErrorHandler.errorResponse(400, null, null, null, err_1, [], definitionId, null);
+                        res.send(errorResponse.httpStatus ? errorResponse.httpStatus : 400, errorResponse);
                         return [2, next()];
-                    case 3: return [2];
+                    case 4: return [2];
                 }
             });
         }); });
@@ -81,7 +81,7 @@ var ConditionerRoute = (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                    var conditionerService, records, err_2;
+                    var conditionerService, records, err_2, handledError;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -93,8 +93,9 @@ var ConditionerRoute = (function () {
                                 return [2, resolve(records)];
                             case 2:
                                 err_2 = _a.sent();
-                                common_1.ErrorHandler.logError("conditionerRoute.executeRoute.error:", err_2);
-                                return [2, reject(err_2)];
+                                handledError = common_1.ErrorHandler.errorResponse(500, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version, err_2, [], definitionId, {});
+                                common_1.ErrorHandler.logError("conditionerRoute.executeRoute.error:", handledError);
+                                return [2, reject(handledError)];
                             case 3: return [2];
                         }
                     });

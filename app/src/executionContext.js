@@ -44,8 +44,9 @@ var _ = require("lodash");
 var util_1 = require("util");
 var actions_1 = require("./actions");
 var ExecutionContext = (function () {
-    function ExecutionContext(definitionId) {
+    function ExecutionContext(definitionId, requestContext) {
         this.definitionId = definitionId;
+        this.requestContext = requestContext;
         this.raw = {};
         this.transformed = {};
         this.parameters = {};
@@ -53,6 +54,8 @@ var ExecutionContext = (function () {
         this.data = {};
         this.actions = {};
         this.response = {};
+        this.warnings = [];
+        this.errors = [];
         this._definition = null;
         this._utilities = new common_1.Utilities();
     }
@@ -69,7 +72,7 @@ var ExecutionContext = (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                    var _a, err_1;
+                    var _a, err_1, handleError;
                     return __generator(this, function (_b) {
                         switch (_b.label) {
                             case 0:
@@ -86,8 +89,9 @@ var ExecutionContext = (function () {
                                 return [2, resolve(this._definition)];
                             case 2:
                                 err_1 = _b.sent();
-                                common_1.ErrorHandler.logError("ExecutionContext.resolveDefinition.error:", err_1);
-                                return [2, reject("Error retrieving Definition " + this.definitionId)];
+                                handleError = common_1.ErrorHandler.errorResponse(400, this.requestContext.body.fileuri, this.requestContext.body.fingerprint, this.requestContext.body.version, err_1, this.warnings, this.definitionId, {});
+                                common_1.ErrorHandler.logError("ExecutionContext.resolveDefinition.error:", handleError);
+                                return [2, reject(handleError)];
                             case 3: return [2];
                         }
                     });
@@ -98,14 +102,83 @@ var ExecutionContext = (function () {
     };
     ExecutionContext.prototype.initialize = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var result;
+            var _this = this;
             return __generator(this, function (_a) {
-                return [2, this.resolveDefinition()];
+                result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                    var definition, err_2, handleError;
+                    var _this = this;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                _a.trys.push([0, 2, , 3]);
+                                return [4, this.resolveDefinition()];
+                            case 1:
+                                definition = _a.sent();
+                                if (definition.parameters) {
+                                    definition.parameters.forEach(function (item) {
+                                        _this.addParameter(item.key, item.value, _this.requestContext);
+                                    });
+                                }
+                                return [2, resolve(true)];
+                            case 2:
+                                err_2 = _a.sent();
+                                handleError = common_1.ErrorHandler.errorResponse(500, this.requestContext.body.fileuri, this.requestContext.body.fingerprint, this.requestContext.body.version, err_2, this.warnings, this.definitionId, {});
+                                common_1.ErrorHandler.logError("ExecutionContext.initialize.error:", handleError);
+                                return [2, reject(handleError)];
+                            case 3: return [2];
+                        }
+                    });
+                }); });
+                return [2, result];
             });
         });
     };
-    ExecutionContext.prototype.getParameter = function (key) {
+    ExecutionContext.prototype.execute = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            var _this = this;
+            return __generator(this, function (_a) {
+                result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                    var response, err_3, handleError;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                _a.trys.push([0, 7, , 8]);
+                                return [4, this.initialize()];
+                            case 1:
+                                _a.sent();
+                                return [4, this.compose()];
+                            case 2:
+                                _a.sent();
+                                return [4, this.schema()];
+                            case 3:
+                                _a.sent();
+                                return [4, this.map()];
+                            case 4:
+                                _a.sent();
+                                return [4, this.act()];
+                            case 5:
+                                _a.sent();
+                                return [4, this.respond()];
+                            case 6:
+                                response = _a.sent();
+                                return [2, resolve(response)];
+                            case 7:
+                                err_3 = _a.sent();
+                                handleError = common_1.ErrorHandler.errorResponse(500, this.getParameterValue('fileuri'), this.getParameterValue('fingerprint'), this.getParameterValue('version'), err_3, this.warnings, this.definitionId, {});
+                                return [2, reject(handleError)];
+                            case 8: return [2];
+                        }
+                    });
+                }); });
+                return [2, result];
+            });
+        });
+    };
+    ExecutionContext.prototype.getParameterValue = function (key) {
         if (!this._definition) {
-            throw new Error("Attempted to execute getParameter method without initializing ExecutionContext");
+            return this.requestContext.body[key];
         }
         var result = this.parameters[key];
         return result;
@@ -133,7 +206,7 @@ var ExecutionContext = (function () {
     ExecutionContext.prototype.compose = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var composerFactory_1, composers_2, documents, err_2, errorSchema;
+            var composerFactory_1, composers_2, documents, err_4, handleError;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -161,12 +234,12 @@ var ExecutionContext = (function () {
                         documents = _a.sent();
                         this.raw = _.merge.apply(_, [{}].concat(documents));
                         this.transformed = _.cloneDeep(this.raw);
-                        return [2, resolve(Object.assign({}, this.raw))];
+                        return [2, resolve(true)];
                     case 4:
-                        err_2 = _a.sent();
-                        common_1.ErrorHandler.logError("ExecutionContext.compose().error:", err_2);
-                        errorSchema = common_1.ErrorHandler.errorResponse("ExecutionContext.compose().error", err_2.httpStatus ? err_2.httpStatus : 500, (err_2.message ? err_2.message : "Error in ExecutionContext"), err_2);
-                        return [2, reject(errorSchema)];
+                        err_4 = _a.sent();
+                        handleError = common_1.ErrorHandler.errorResponse(500, this.getParameterValue('fileuri'), this.getParameterValue('fingerprint'), this.getParameterValue('version'), err_4, this.warnings, this.definitionId, {});
+                        common_1.ErrorHandler.logError("ExecutionContext.compose().error:", handleError);
+                        return [2, reject(handleError)];
                     case 5: return [2];
                 }
             });
@@ -176,7 +249,7 @@ var ExecutionContext = (function () {
     ExecutionContext.prototype.schema = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var maxOrdinal, keepGoing, currentOrdinal, _loop_1, this_1, err_3, errorSchema;
+            var maxOrdinal, keepGoing, currentOrdinal, _loop_1, this_1, err_5, handleError;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -227,12 +300,12 @@ var ExecutionContext = (function () {
                     case 4:
                         _a.sent();
                         return [3, 3];
-                    case 5: return [2, resolve(Object.assign({}, this.transformed))];
+                    case 5: return [2, resolve(true)];
                     case 6:
-                        err_3 = _a.sent();
-                        common_1.ErrorHandler.logError("ExecutionContext.schema().error:", err_3);
-                        errorSchema = common_1.ErrorHandler.errorResponse("ExecutionContext.schema().error", err_3.httpStatus ? err_3.httpStatus : 500, (err_3.message ? err_3.message : "Error in ExecutionContext"), err_3);
-                        return [2, reject(errorSchema)];
+                        err_5 = _a.sent();
+                        handleError = common_1.ErrorHandler.errorResponse(500, this.getParameterValue('fileuri'), this.getParameterValue('fingerprint'), this.getParameterValue('version'), err_5, this.warnings, this.definitionId, {});
+                        common_1.ErrorHandler.logError("ExecutionContext.schema().error:", handleError);
+                        return [2, reject(handleError)];
                     case 7: return [2];
                 }
             });
@@ -242,7 +315,7 @@ var ExecutionContext = (function () {
     ExecutionContext.prototype.map = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var mapObject_1, maps, err_4, errorSchema;
+            var mapObject_1, maps, err_6, handleError;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -265,12 +338,12 @@ var ExecutionContext = (function () {
                             });
                         }
                         this.mapped = Object.assign({}, mapObject_1);
-                        return [2, resolve(this.mapped)];
+                        return [2, resolve(true)];
                     case 3:
-                        err_4 = _a.sent();
-                        common_1.ErrorHandler.logError("ExecutionContext.map().error:", err_4);
-                        errorSchema = common_1.ErrorHandler.errorResponse("ExecutionContext.map().error", err_4.httpStatus ? err_4.httpStatus : 500, (err_4.message ? err_4.message : "Error in ExecutionContext"), err_4);
-                        return [2, reject(errorSchema)];
+                        err_6 = _a.sent();
+                        handleError = common_1.ErrorHandler.errorResponse(500, this.getParameterValue('fileuri'), this.getParameterValue('fingerprint'), this.getParameterValue('version'), err_6, this.warnings, this.definitionId, {});
+                        common_1.ErrorHandler.logError("ExecutionContext.map().error:", handleError);
+                        return [2, reject(handleError)];
                     case 4: return [2];
                 }
             });
@@ -280,7 +353,7 @@ var ExecutionContext = (function () {
     ExecutionContext.prototype.act = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var actions, actionFactory_1, tasks_1, responses, err_5, errorSchema;
+            var actions, actionFactory_1, tasks_1, responses, err_7, handleError;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -304,14 +377,14 @@ var ExecutionContext = (function () {
                     case 3:
                         responses = _a.sent();
                         this.actions = _.merge.apply(_, [{}].concat(responses));
-                        return [2, resolve(Object.assign({}, this.actions))];
-                    case 4: return [2, resolve({})];
+                        return [2, resolve(true)];
+                    case 4: return [2, resolve(false)];
                     case 5: return [3, 7];
                     case 6:
-                        err_5 = _a.sent();
-                        common_1.ErrorHandler.logError("ExecutionContext.act().error:", err_5);
-                        errorSchema = common_1.ErrorHandler.errorResponse("ExecutionContext.act().error", err_5.httpStatus ? err_5.httpStatus : 500, (err_5.message ? err_5.message : "Error in ExecutionContext"), err_5);
-                        return [2, reject(errorSchema)];
+                        err_7 = _a.sent();
+                        handleError = common_1.ErrorHandler.errorResponse(500, this.getParameterValue('fileuri'), this.getParameterValue('fingerprint'), this.getParameterValue('version'), err_7, this.warnings, this.definitionId, {});
+                        common_1.ErrorHandler.logError("ExecutionContext.act().error:", handleError);
+                        return [2, reject(handleError)];
                     case 7: return [2];
                 }
             });
@@ -323,13 +396,19 @@ var ExecutionContext = (function () {
         var result = new Promise(function (resolve, reject) {
             var response = new schemas_1.ConditionerResponseSchema();
             try {
+                response.fileUri = _this.getParameterValue('fileuri');
+                response.fingerprint = _this.getParameterValue('fingerprint');
                 response.version = _this.parameters['version'];
                 response.data = JSON.parse(JSON.stringify(_this.mapped));
+                response.ods_code = 0;
+                response.ods_errors = JSON.parse(JSON.stringify(_this.errors));
+                response.ods_definition = _this.definitionId;
                 return resolve(response);
             }
             catch (err) {
-                common_1.ErrorHandler.logError("ExecutionContext.respond.error:", err);
-                return reject(response);
+                var handleError = common_1.ErrorHandler.errorResponse(500, _this.getParameterValue('fileuri'), _this.getParameterValue('fingerprint'), _this.getParameterValue('version'), err, _this.warnings, _this.definitionId, {});
+                common_1.ErrorHandler.logError("ExecutionContext.respond.error:", handleError);
+                return reject(handleError);
             }
         });
         return result;

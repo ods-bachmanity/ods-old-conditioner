@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var responseModel_1 = require("./responseModel");
+var schemas_1 = require("../src/schemas");
 var HealthCheckService = (function () {
     function HealthCheckService() {
     }
     HealthCheckService.get = function () {
-        var result = new responseModel_1.ResponseModel();
+        var result = new schemas_1.HealthResponseSchema();
         result.data = {
             RunningProperly: true
         };

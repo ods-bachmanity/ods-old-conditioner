@@ -5,7 +5,6 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./errorHandler"));
 __export(require("./healthCheckService"));
-__export(require("./responseModel"));
 __export(require("./routeServer"));
 __export(require("./utilities"));
 __export(require("./swaggerService"));

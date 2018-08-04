@@ -50,14 +50,12 @@ var DefinitionRoute = (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
+                        res.contentType = 'application/json';
+                        res.header('Content-Type', 'application/json');
                         if (!req.params || !req.params.id) {
-                            res.contentType = 'application/json';
-                            res.header('Content-Type', 'application/json');
                             res.send(400, 'Bad Request');
                             return [2, next()];
                         }
-                        res.contentType = 'application/json';
-                        res.header('Content-Type', 'application/json');
                         id = req.params.id;
                         return [4, this._definitionService.get(id)];
                     case 1:
@@ -67,8 +65,6 @@ var DefinitionRoute = (function () {
                     case 2:
                         err_1 = _a.sent();
                         common_1.ErrorHandler.logError("DefinitionRoute.init.get(" + path + ").error:", err_1);
-                        res.contentType = 'application/json';
-                        res.header('Content-Type', 'application/json');
                         res.send(err_1.httpStatus ? err_1.httpStatus : 500, err_1);
                         return [2, next()];
                     case 3: return [2];

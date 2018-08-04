@@ -1,11 +1,11 @@
 import { Utilities } from './utilities'
-import { ResponseModel } from './responseModel';
+import { HealthResponseSchema } from '../src/schemas';
 
 export class HealthCheckService {
 
-    public static get(): Promise<ResponseModel> {
+    public static get(): Promise<HealthResponseSchema> {
         
-        const result: ResponseModel = new ResponseModel()
+        const result: HealthResponseSchema = new HealthResponseSchema()
         result.data = {
             RunningProperly: true
         }

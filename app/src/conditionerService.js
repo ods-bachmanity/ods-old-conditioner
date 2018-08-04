@@ -36,7 +36,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var common_1 = require("../common");
-var schemas_1 = require("./schemas");
 var _1 = require("./");
 var ConditionerService = (function () {
     function ConditionerService() {
@@ -44,48 +43,19 @@ var ConditionerService = (function () {
     ConditionerService.prototype.execute = function (definitionId, requestContext) {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var executionContext_1, definition, activity, _a, _b, _c, _d, response, err_1, errorSchema;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
-                    case 0:
-                        _e.trys.push([0, 7, , 8]);
-                        executionContext_1 = new _1.ExecutionContext(definitionId);
-                        return [4, executionContext_1.initialize()];
-                    case 1:
-                        definition = _e.sent();
-                        if (definition.parameters) {
-                            definition.parameters.forEach(function (item) {
-                                executionContext_1.addParameter(item.key, item.value, requestContext);
-                            });
-                        }
-                        activity = new schemas_1.ConditionerExecutionSchema();
-                        _a = activity;
-                        return [4, executionContext_1.compose()];
-                    case 2:
-                        _a.raw = _e.sent();
-                        _b = activity;
-                        return [4, executionContext_1.schema()];
-                    case 3:
-                        _b.transformed = _e.sent();
-                        _c = activity;
-                        return [4, executionContext_1.map()];
-                    case 4:
-                        _c.map = _e.sent();
-                        _d = activity;
-                        return [4, executionContext_1.act()];
-                    case 5:
-                        _d.actions = _e.sent();
-                        return [4, executionContext_1.respond()];
-                    case 6:
-                        response = _e.sent();
-                        return [2, resolve(response)];
-                    case 7:
-                        err_1 = _e.sent();
-                        common_1.ErrorHandler.logError("ConditionerService.execute(" + definitionId + ").error:", err_1);
-                        errorSchema = common_1.ErrorHandler.errorResponse("ConditionerService.execute(" + definitionId + ")", err_1.httpStatus ? err_1.httpStatus : 500, (err_1.message ? err_1.message : "Error in ConditionerService"), err_1);
-                        return [2, reject(errorSchema)];
-                    case 8: return [2];
+            var executionContext, activity, handleError;
+            return __generator(this, function (_a) {
+                try {
+                    executionContext = new _1.ExecutionContext(definitionId, requestContext);
+                    activity = executionContext.execute();
+                    return [2, resolve(activity)];
                 }
+                catch (err) {
+                    handleError = common_1.ErrorHandler.errorResponse(400, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version, err, [], definitionId, {});
+                    common_1.ErrorHandler.logError("ConditionerService.execute(" + definitionId + ").error:", handleError);
+                    return [2, reject(handleError)];
+                }
+                return [2];
             });
         }); });
         return result;

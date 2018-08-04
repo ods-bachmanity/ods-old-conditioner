@@ -1,76 +1,95 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var config = require("config");
 var schemas_1 = require("../src/schemas");
 var ErrorHandler = (function () {
     function ErrorHandler(server) {
         this.server = server;
-        this._defaultMessage = "Error Occurred. Logs on Server.";
     }
     ErrorHandler.prototype.init = function () {
-        var _this = this;
         this.server.on('InternalError', function (req, res, err, next) {
-            console.error("Internal Error: " + err);
-            var error = new schemas_1.ErrorSchema();
-            error.message = "Internal Error: " + err;
-            res.send(error.httpStatus, _this.errorMessage(error.message));
+            ErrorHandler.logError("Internal Error", err);
+            res.contentType = 'application/json';
+            res.header('Content-Type', 'application/json');
+            res.send(500, ErrorHandler.internalErrorResponse(err));
             return next();
         });
         this.server.on('InternalServerError', function (req, res, err, next) {
-            console.error("Internal Server Error: " + err);
-            var error = new schemas_1.ErrorSchema();
-            error.message = "Internal Server Error: " + err;
-            res.send(error.httpStatus, _this.errorMessage(error.message));
+            ErrorHandler.logError("Internal Server Error", err);
+            res.contentType = 'application/json';
+            res.header('Content-Type', 'application/json');
+            res.send(500, ErrorHandler.internalErrorResponse(err));
             return next();
         });
         this.server.on('restifyError', function (req, res, err, next) {
-            console.error("Restify Error: " + err);
-            var error = new schemas_1.ErrorSchema();
-            error.message = "Restify Error: " + err;
-            res.send(error.httpStatus, _this.errorMessage(error.message));
+            ErrorHandler.logError("Restify Error", err);
+            res.contentType = 'application/json';
+            res.header('Content-Type', 'application/json');
+            res.send(500, ErrorHandler.internalErrorResponse(err));
             return next();
         });
         this.server.on('uncaughtException', function (req, res, err, next) {
-            console.error("Uncaught Exception: " + err);
-            var error = new schemas_1.ErrorSchema();
-            error.message = "Uncaught Exception: " + err;
-            res.send(error.httpStatus, _this.errorMessage(error.message));
+            ErrorHandler.logError("Uncaught Exception", err);
+            res.contentType = 'application/json';
+            res.header('Content-Type', 'application/json');
+            res.send(500, ErrorHandler.internalErrorResponse(err));
             return next();
         });
     };
-    ErrorHandler.errorResponse = function (source, httpStatus, message, err) {
-        var errorSchema = new schemas_1.ErrorSchema();
-        errorSchema.debug = (!config.production ? source : null);
-        errorSchema.httpStatus = httpStatus || 500;
-        errorSchema.message = message || (err.message ? err.message : 'Error');
-        errorSchema.error = (!config.production ? err : null);
-        return errorSchema;
-    };
     ErrorHandler.logError = function (source, err) {
+        var now = new Date();
+        var timeString = now.getUTCHours() + ":" + now.getUTCMinutes() + ":" + now.getUTCSeconds() + ":" + now.getUTCMilliseconds();
+        console.error(timeString + ":> ERROR IN " + source + " " + this.errorText(err));
+        return;
+    };
+    ErrorHandler.errorText = function (err) {
         if ((typeof err === "object") && (err !== null)) {
-            return console.error("ERROR: " + source + ": " + JSON.stringify(err, null, 1));
+            if (err.ods_errors && err.ods_errors.length > 0) {
+                return "" + err.ods_errors.toString();
+            }
+            if (err.message)
+                return err.message;
+            return "" + JSON.stringify(err);
         }
-        console.error("ERROR: " + source + ": " + err);
+        return "" + err;
     };
-    ErrorHandler.slimError = function (err) {
-        if (typeof (err) !== 'object')
-            return {
-                message: err
-            };
-        if (err.message) {
-            return { message: err.message };
+    ErrorHandler.errorResponse = function (httpStatusCode, fileUri, fingerprint, version, err, ods_warnings, ods_definition, data) {
+        if (err.ods_code) {
+            err.ods_code = -1;
+            if (fileUri && !err.fileUri)
+                err.fileUri = fileUri;
+            if (fingerprint && !err.fingerprint)
+                err.fingerprint = fingerprint;
+            if (version && !err.version)
+                err.version = version;
+            if (ods_warnings && ods_warnings.length > 0) {
+                err.ods_warnings.push(ods_warnings);
+            }
+            if (ods_definition && !err.ods_definition)
+                err.ods_definition = ods_definition;
+            if (data && !err.data)
+                err.data = data;
+            return JSON.parse(JSON.stringify(err));
         }
-        return err;
-    };
-    ErrorHandler.prototype.errorMessage = function (err) {
-        if (config.production) {
-            return this._defaultMessage;
-        }
-        var result = this._defaultMessage;
-        if (err) {
-            result = err.message ? err.message : err.toString();
-        }
+        var result = new schemas_1.ConditionerResponseSchema();
+        result.ods_code = -1;
+        result.httpStatus = httpStatusCode;
+        result.fileUri = fileUri || null;
+        result.fingerprint = fingerprint || null;
+        result.version = version || null;
+        result.ods_errors = [ErrorHandler.errorText(err)];
+        result.ods_warnings = ods_warnings || [];
+        result.ods_definition = ods_definition || null;
+        result.data = data || {};
         return result;
+    };
+    ErrorHandler.internalErrorResponse = function (err) {
+        return {
+            ods_code: -1,
+            ods_errors: [ErrorHandler.errorText(err)],
+            ods_warnings: [],
+            ods_definition: null,
+            data: {}
+        };
     };
     return ErrorHandler;
 }());

@@ -58,7 +58,7 @@ var ElasticUpdateAction = (function (_super) {
     ElasticUpdateAction.prototype.fx = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var date, timestamp, url, uname, pw, response, err_1;
+            var date, timestamp, url, uname, pw, response, err_1, handleError;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -72,7 +72,7 @@ var ElasticUpdateAction = (function (_super) {
                             timestamp: "" + timestamp,
                             status: true
                         };
-                        return [2, resolve({})];
+                        _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
                         url = this.executionContext.parameters.catalog_endpoint_update;
@@ -97,14 +97,15 @@ var ElasticUpdateAction = (function (_super) {
                         return [2, resolve(JSON.parse(response))];
                     case 3:
                         err_1 = _a.sent();
-                        common_1.ErrorHandler.logError("elasticUpdateAction.fx", err_1);
+                        handleError = common_1.ErrorHandler.errorResponse(500, this.executionContext.getParameterValue('fileuri'), this.executionContext.getParameterValue('fingerprint'), this.executionContext.getParameterValue('version'), err_1, this.executionContext.warnings, this.executionContext.definition.id, {});
+                        common_1.ErrorHandler.logError("elasticUpdateAction.fx", handleError);
                         this.executionContext.mapped.ods.conditioners[this.executionContext.definition.id] = {
                             version: '0.0.1',
                             timestamp: "" + timestamp,
                             status: false,
                             error: err_1.message ? err_1.message : "Error in Elastic Action"
                         };
-                        return [2, reject(err_1)];
+                        return [2, reject(handleError)];
                     case 4: return [2];
                 }
             });

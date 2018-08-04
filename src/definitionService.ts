@@ -31,15 +31,15 @@ export class DefinitionService {
                 return resolve(def)
             }
             catch (err) {
-                const error = ErrorHandler.errorResponse(`DefinitionService.get(${id})`, 
-                    500, err.message ? err.message : `Invalid Definition Id`, err)
+                let handleError
                 if (err.code === 'ENOENT') {
-                    console.error(`DefinitionService.get(${id}).error: Unable to find definition file @${filePath}`)
-                    error.httpStatus = 404
-                    return reject(error)
+                    console.log(`DefinitionService.get(${id}).error: Unable to find definition file @${filePath}`)
+                    handleError = ErrorHandler.errorResponse(404, null,null,null,err,[],id,{})
+                    return reject(handleError)
                 }
-                ErrorHandler.logError(`DefinitionService.get(${id}).error:`, err)
-                return reject(error)
+                handleError = ErrorHandler.errorResponse(500, null,null,null,err,[],id,{})
+                ErrorHandler.logError(`DefinitionService.get(${id}).error:`, handleError)
+                return reject(handleError)
             }
 
         })

@@ -23,7 +23,6 @@ export class ElasticUpdateAction extends BaseAction {
                 timestamp: `${timestamp}`,
                 status: true
             }
-            return resolve({})
             
             try {
 
@@ -53,7 +52,10 @@ export class ElasticUpdateAction extends BaseAction {
                 
             }
             catch (err) {
-                ErrorHandler.logError(`elasticUpdateAction.fx`, err)
+                const handleError = ErrorHandler.errorResponse(500,this.executionContext.getParameterValue('fileuri'),
+                this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), err, 
+                this.executionContext.warnings,this.executionContext.definition.id,{})
+                ErrorHandler.logError(`elasticUpdateAction.fx`, handleError)
                 // TODO: Error Handling
                 this.executionContext.mapped.ods.conditioners[this.executionContext.definition.id] = {
                     version: '0.0.1',
@@ -61,7 +63,7 @@ export class ElasticUpdateAction extends BaseAction {
                     status: false,
                     error: err.message ? err.message : `Error in Elastic Action`
                 }
-                return reject(err)
+                return reject(handleError)
             }
             
         })

@@ -10,19 +10,17 @@ export class ConditionerRoute {
 
         this.server.post(path, async (req, res, next) => {
 
+            let definitionId = ''
             try {
-                if (!req.params || !req.params.definitionId) {
-                    res.contentType = 'application/json'
-                    res.header('Content-Type', 'application/json')
-                    
-                    res.send(400, 'Bad Request')
-                    return next()
-                }
-                const definitionId = req.params.definitionId
-                const result = await this.executeRoute(definitionId, req)
-
                 res.contentType = 'application/json'
                 res.header('Content-Type', 'application/json')
+
+                if (!req.params || !req.params.definitionId) {                    
+                    res.send(400, ErrorHandler.errorResponse(400,req.body.fileuri, req.body.fingerprint, req.body.version, 'Invalid Definition Id',[],req.params.definition,{}))
+                    return next()
+                }
+                definitionId = req.params.definitionId
+                const result = await this.executeRoute(definitionId, req)
                 
                 res.send(200, result)
             
@@ -30,11 +28,8 @@ export class ConditionerRoute {
             }
             catch (err) {
                 ErrorHandler.logError(`ConditionerRoute.init.post(${path}).error:`, err)
-
-                res.contentType = 'application/json'
-                res.header('Content-Type', 'application/json')
-                
-                res.send(err.httpStatus ? err.httpStatus : 500, err)
+                const errorResponse = ErrorHandler.errorResponse(400,null,null,null,err,[],definitionId,null)
+                res.send(errorResponse.httpStatus ? errorResponse.httpStatus : 400, errorResponse)
                 return next()
             }
 
@@ -56,8 +51,10 @@ export class ConditionerRoute {
     
             }
             catch (err) {
-                ErrorHandler.logError(`conditionerRoute.executeRoute.error:`, err)
-                return reject(err)
+                const handledError = ErrorHandler.errorResponse(500, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version,
+                    err, [],definitionId, {})
+                    ErrorHandler.logError(`conditionerRoute.executeRoute.error:`, handledError)
+                    return reject(handledError)
             }
 
         })

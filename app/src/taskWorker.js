@@ -49,7 +49,7 @@ var TaskWorker = (function () {
     TaskWorker.prototype.execute = function () {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var fieldValue, nullOrEmpty, isExactMatch, index, index, matchedCaseRecord, transform, caseResult, tasks_1, response, tasks_2, response, err_1;
+            var fieldValue, nullOrEmpty, isExactMatch, index, index, matchedCaseRecord, transform, caseResult, tasks_1, response, tasks_2, response, err_1, handleError;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -131,9 +131,10 @@ var TaskWorker = (function () {
                     case 6: return [2, resolve(Object.assign({}, this.executionContext.transformed))];
                     case 7:
                         err_1 = _a.sent();
-                        common_1.ErrorHandler.logError("TaskWorker.execute().error:", err_1);
-                        return [2, reject(err_1)];
-                    case 8: return [2, resolve()];
+                        handleError = common_1.ErrorHandler.errorResponse(500, this.executionContext.getParameterValue('fileuri'), this.executionContext.getParameterValue('fingerprint'), this.executionContext.getParameterValue('version'), err_1, this.executionContext.warnings, this.executionContext.definition.id, {});
+                        common_1.ErrorHandler.logError("TaskWorker.execute().error:", handleError);
+                        return [2, reject(handleError)];
+                    case 8: return [2];
                 }
             });
         }); });

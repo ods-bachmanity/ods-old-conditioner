@@ -46,7 +46,7 @@ var DefinitionService = (function () {
     DefinitionService.prototype.get = function (id) {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var filePath, isInMemoryObject, def, err_1, error;
+            var filePath, isInMemoryObject, def, err_1, handleError;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -69,14 +69,15 @@ var DefinitionService = (function () {
                         return [2, resolve(def)];
                     case 4:
                         err_1 = _a.sent();
-                        error = common_1.ErrorHandler.errorResponse("DefinitionService.get(" + id + ")", 500, err_1.message ? err_1.message : "Invalid Definition Id", err_1);
+                        handleError = void 0;
                         if (err_1.code === 'ENOENT') {
-                            console.error("DefinitionService.get(" + id + ").error: Unable to find definition file @" + filePath);
-                            error.httpStatus = 404;
-                            return [2, reject(error)];
+                            console.log("DefinitionService.get(" + id + ").error: Unable to find definition file @" + filePath);
+                            handleError = common_1.ErrorHandler.errorResponse(404, null, null, null, err_1, [], id, {});
+                            return [2, reject(handleError)];
                         }
-                        common_1.ErrorHandler.logError("DefinitionService.get(" + id + ").error:", err_1);
-                        return [2, reject(error)];
+                        handleError = common_1.ErrorHandler.errorResponse(500, null, null, null, err_1, [], id, {});
+                        common_1.ErrorHandler.logError("DefinitionService.get(" + id + ").error:", handleError);
+                        return [2, reject(handleError)];
                     case 5: return [2];
                 }
             });

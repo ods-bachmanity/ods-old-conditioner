@@ -22,8 +22,6 @@ export class SwaggerRoute {
             }
             catch (err) {
                 ErrorHandler.logError(`SwaggerRoute.init.get(${path}).error:`, err)
-                res.contentType = 'application/json'
-                res.header('Content-Type', 'application/json')
                 
                 res.send(500, err)
                 return next()

@@ -10,25 +10,26 @@ export class BulkConditionerRoute {
 
         this.server.post(path, async (req, res, next) => {
 
+            let definitionId = ''
             try {
                 res.contentType = 'application/json'
                 res.header('Content-Type', 'application/json')
     
                 if (!req.params || !req.params.definitionId) {
                     
-                    res.send(400, 'Bad Request')
+                    res.send(400, ErrorHandler.errorResponse(400,null,null,null,'Missing definition id parameter',[],null,{}))
                     return next()
 
                 }
 
                 if (!req.body.files || req.body.files.length <= 0) {
 
-                    res.send(400, {code: -1, message: 'Invalid Request Body. Missing files item.'})
+                    res.send(400, ErrorHandler.errorResponse(400,null,null,null,'Invalid Request Body. Missing files item',[],null,{}))
                     return next()
 
                 }
 
-                const definitionId = req.params.definitionId
+                definitionId = req.params.definitionId
                 
                 const workitems = []
                 const responses = []
@@ -39,19 +40,18 @@ export class BulkConditionerRoute {
                     }))
                 })
 
-                const records = await Promise.all(workitems)
+                await Promise.all(workitems)
                 const response = []
                 responses.forEach((conditionedItem) => {
-                    const output = {
-                        contentId: conditionedItem.contentId,
+                    const output:ConditionerResponseSchema = {
                         fileUri: conditionedItem.fileUri,
                         fingerprint: conditionedItem.fingerprint,
                         version:  conditionedItem.version,
-                        data: Object.assign({}, conditionedItem.data),
                         ods_code: conditionedItem.ods_code,
                         ods_errors: conditionedItem.ods_errors,
+                        ods_warnings: conditionedItem.ods_warnings,
                         ods_definition: conditionedItem.ods_definition,
-                        emc: conditionedItem.emc
+                        data: Object.assign({}, conditionedItem.data)
                     }
                     response.push(output)
                 })
@@ -62,8 +62,8 @@ export class BulkConditionerRoute {
             }
             catch (err) {
                 ErrorHandler.logError(`BulkConditionerRoute.init.post(${path}).error:`, err)
-                // TODO: Error Handling
-                res.send(err.httpStatus ? err.httpStatus : 500, err)
+                const errorResponse = ErrorHandler.errorResponse(400,null,null,null,err,[],definitionId,null)
+                res.send(errorResponse.httpStatus ? errorResponse.httpStatus : 400, errorResponse)
                 return next()
             }
 
@@ -71,13 +71,12 @@ export class BulkConditionerRoute {
 
     }
 
-    private executeRoute(definitionId: string, requestContext: any): Promise<any> {
+    private executeRoute(definitionId: string, requestContext: any): Promise<ConditionerResponseSchema> {
 
-        const result = new Promise(async (resolve, reject) => {
+        const result: Promise<ConditionerResponseSchema> = new Promise(async (resolve, reject) => {
 
             try {
 
-                // console.log(`Executing request ${JSON.stringify(requestContext.body,null,2)}`)
                 const conditionerService = new ConditionerService()
                 
                 const records: ConditionerResponseSchema = await conditionerService.execute(definitionId, requestContext)
@@ -86,8 +85,10 @@ export class BulkConditionerRoute {
     
             }
             catch (err) {
-                ErrorHandler.logError(`bulkConditionerRoute.executeRoute.error:`, err)
-                return reject(err)
+                const handledError = ErrorHandler.errorResponse(500, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version,
+                    err, [],definitionId, {})
+                ErrorHandler.logError(`bulkConditionerRoute.executeRoute.error:`, handledError)
+                return reject(handledError)
             }
 
         })

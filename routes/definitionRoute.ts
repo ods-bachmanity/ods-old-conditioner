@@ -14,16 +14,13 @@ export class DefinitionRoute {
         this.server.get(path, async (req, res, next) => {
 
             try {
+                res.contentType = 'application/json'
+                res.header('Content-Type', 'application/json')
                 if (!req.params || !req.params.id) {
-                    res.contentType = 'application/json'
-                    res.header('Content-Type', 'application/json')
-                    
                     res.send(400, 'Bad Request')
                     return next()
                 }
-                res.contentType = 'application/json'
-                res.header('Content-Type', 'application/json')
-                
+
                 const id = req.params.id
                 const result = await this._definitionService.get(id)
                 res.send(200, result)
@@ -32,8 +29,6 @@ export class DefinitionRoute {
             }
             catch (err) {
                 ErrorHandler.logError(`DefinitionRoute.init.get(${path}).error:`, err)
-                res.contentType = 'application/json'
-                res.header('Content-Type', 'application/json')
                 
                 res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()

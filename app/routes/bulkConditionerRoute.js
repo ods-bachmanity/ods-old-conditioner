@@ -44,57 +44,60 @@ var BulkConditionerRoute = (function () {
     BulkConditionerRoute.prototype.init = function (path) {
         var _this = this;
         this.server.post(path, function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-            var definitionId_1, workitems_1, responses_1, records, response_1, err_1;
+            var definitionId, workitems_1, responses_1, response_1, err_1, errorResponse;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
+                        definitionId = '';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
                         res.contentType = 'application/json';
                         res.header('Content-Type', 'application/json');
                         if (!req.params || !req.params.definitionId) {
-                            res.send(400, 'Bad Request');
+                            res.send(400, common_1.ErrorHandler.errorResponse(400, null, null, null, 'Missing definition id parameter', [], null, {}));
                             return [2, next()];
                         }
                         if (!req.body.files || req.body.files.length <= 0) {
-                            res.send(400, { code: -1, message: 'Invalid Request Body. Missing files item.' });
+                            res.send(400, common_1.ErrorHandler.errorResponse(400, null, null, null, 'Invalid Request Body. Missing files item', [], null, {}));
                             return [2, next()];
                         }
-                        definitionId_1 = req.params.definitionId;
+                        definitionId = req.params.definitionId;
                         workitems_1 = [];
                         responses_1 = [];
                         req.body.files.forEach(function (item) {
                             var mockRequestBody = { body: item };
-                            workitems_1.push(_this.executeRoute(definitionId_1, mockRequestBody).then(function (workItemResponse) {
+                            workitems_1.push(_this.executeRoute(definitionId, mockRequestBody).then(function (workItemResponse) {
                                 responses_1.push(Object.assign({}, workItemResponse));
                             }));
                         });
                         return [4, Promise.all(workitems_1)];
-                    case 1:
-                        records = _a.sent();
+                    case 2:
+                        _a.sent();
                         response_1 = [];
                         responses_1.forEach(function (conditionedItem) {
                             var output = {
-                                contentId: conditionedItem.contentId,
                                 fileUri: conditionedItem.fileUri,
                                 fingerprint: conditionedItem.fingerprint,
                                 version: conditionedItem.version,
-                                data: Object.assign({}, conditionedItem.data),
                                 ods_code: conditionedItem.ods_code,
                                 ods_errors: conditionedItem.ods_errors,
+                                ods_warnings: conditionedItem.ods_warnings,
                                 ods_definition: conditionedItem.ods_definition,
-                                emc: conditionedItem.emc
+                                data: Object.assign({}, conditionedItem.data)
                             };
                             response_1.push(output);
                         });
                         res.end(JSON.stringify(response_1));
                         return [2, next()];
-                    case 2:
+                    case 3:
                         err_1 = _a.sent();
                         common_1.ErrorHandler.logError("BulkConditionerRoute.init.post(" + path + ").error:", err_1);
-                        res.send(err_1.httpStatus ? err_1.httpStatus : 500, err_1);
+                        errorResponse = common_1.ErrorHandler.errorResponse(400, null, null, null, err_1, [], definitionId, null);
+                        res.send(errorResponse.httpStatus ? errorResponse.httpStatus : 400, errorResponse);
                         return [2, next()];
-                    case 3: return [2];
+                    case 4: return [2];
                 }
             });
         }); });
@@ -102,7 +105,7 @@ var BulkConditionerRoute = (function () {
     BulkConditionerRoute.prototype.executeRoute = function (definitionId, requestContext) {
         var _this = this;
         var result = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-            var conditionerService, records, err_2;
+            var conditionerService, records, err_2, handledError;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -114,8 +117,9 @@ var BulkConditionerRoute = (function () {
                         return [2, resolve(records)];
                     case 2:
                         err_2 = _a.sent();
-                        common_1.ErrorHandler.logError("bulkConditionerRoute.executeRoute.error:", err_2);
-                        return [2, reject(err_2)];
+                        handledError = common_1.ErrorHandler.errorResponse(500, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version, err_2, [], definitionId, {});
+                        common_1.ErrorHandler.logError("bulkConditionerRoute.executeRoute.error:", handledError);
+                        return [2, reject(handledError)];
                     case 3: return [2];
                 }
             });
