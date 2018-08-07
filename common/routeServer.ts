@@ -1,13 +1,18 @@
 import * as restify from 'restify'
 import * as config from 'config'
 
+import { ILogger } from '../src/schemas'
+
 export class RouteServer {
 
     private restifyServer: any;
 
+    constructor(private logger: ILogger) {}
+
     public init(): any {
 
         let options = {};
+        this.logger.info(`Initializing RouteService`)
         if (!process.env.PRODUCTION) {
             options = {
                 formatters: {
@@ -38,7 +43,7 @@ export class RouteServer {
         }
         
         this.restifyServer.listen(thePort, () => {
-            console.log('%s listening at %s', this.restifyServer.name, this.restifyServer.url)
+            this.logger.info(`${this.restifyServer.name} listening at ${this.restifyServer.url}`)
         })
 
     }

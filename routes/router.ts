@@ -5,12 +5,19 @@ import * as path from 'path'
 
 import { HealthCheckRoute, SwaggerRoute, DefinitionRoute, ConditionerRoute, BulkConditionerRoute } from '.'
 import { ErrorHandler } from '../common'
+import { ILogger } from '../src/schemas'
 
 export class Router {
 
-    public constructor (private server, private errorHandler: ErrorHandler) {}
+    public constructor (private server, private logger: ILogger) {}
 
     public init(baseUri: string) {
+
+        this.server.pre((req, res, next) => {
+            res.contentType = 'application/json'
+            res.header('Content-Type', 'application/json')
+            return next()
+        })
 
         // Health Check
         // api/health
@@ -38,7 +45,7 @@ export class Router {
             Lastly, there is a handler to gracefully handle 'Resource Not Found' 404 status
         */
         if (config.serveSwagger) {
-            console.log('Serving swagger content')
+            this.logger.info('Serving swagger content')
             const swaggerRoute = new SwaggerRoute(this.server)
             swaggerRoute.init('/swagger.io')
         }
@@ -49,9 +56,9 @@ export class Router {
             const checkPath = sharePath.startsWith('./') ? path.join(process.cwd(), sharePath) : sharePath
             // Sync version ok here since this executes on start up only
             if (!fs.existsSync(checkPath)) {
-                console.error(`Invalid serveStaticPath in config file, directory does not exist: ${checkPath}`)
+                this.logger.error(`Invalid serveStaticPath in config file, directory does not exist: ${checkPath}`)
             } else {
-                console.log(`Serving Static content from ${sharePath}`)
+                this.logger.info(`Serving Static content from ${sharePath}`)
                 this.server.get('/*', restify.plugins.serveStatic({
                     directory: sharePath,
                     default: './index.html'
@@ -61,7 +68,7 @@ export class Router {
 
         // Handle 404
         this.server.on('NotFound', (req, res, next) => {
-            console.error(`Router not found: ${req.url}`)
+            this.logger.error(`Router not found: ${req.url}`)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             

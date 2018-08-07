@@ -1,12 +1,16 @@
-import { ConditionerResponseSchema } from '../src/schemas'
+import { ConditionerResponseSchema, ILogger } from '../src/schemas'
 
 export class ErrorHandler {
 
-    constructor (private server) {}
+    private static _logger: ILogger = null
 
-    init () {
+    constructor (private logger: ILogger) {
+        ErrorHandler._logger = logger
+    }
 
-        this.server.on('InternalError', (req, res, err, next) => {
+    init (server: any) {
+
+        server.on('InternalError', (req, res, err, next) => {
             ErrorHandler.logError(`Internal Error`, err)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
@@ -14,7 +18,7 @@ export class ErrorHandler {
             return next()
         })
 
-        this.server.on('InternalServerError', (req, res, err, next) => {
+        server.on('InternalServerError', (req, res, err, next) => {
             ErrorHandler.logError(`Internal Server Error`, err)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
@@ -22,7 +26,7 @@ export class ErrorHandler {
             return next()
         })
 
-        this.server.on('restifyError', (req, res, err, next) => {
+        server.on('restifyError', (req, res, err, next) => {
             ErrorHandler.logError(`Restify Error`, err)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
@@ -30,7 +34,7 @@ export class ErrorHandler {
             return next()
         })
 
-        this.server.on('uncaughtException', (req, res, err, next) => {
+        server.on('uncaughtException', (req, res, err, next) => {
             ErrorHandler.logError(`Uncaught Exception`, err)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
@@ -44,7 +48,9 @@ export class ErrorHandler {
 
         const now = new Date()
         const timeString = `${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getUTCSeconds()}:${now.getUTCMilliseconds()}`
-        console.error(`${timeString}:> ERROR IN ${source} ${this.errorText(err)}`)
+        if (ErrorHandler._logger) {
+            ErrorHandler._logger.error(`${timeString}:> ERROR IN ${source} ${this.errorText(err)}`)
+        }
         return
 
     }
