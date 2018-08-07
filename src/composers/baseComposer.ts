@@ -1,5 +1,6 @@
 import { DefinitionSchema, ComposerDefSchema, KeyValuePair, AuthenticationStrategies } from '../schemas'
-import { ExecutionContext } from '../'
+import { ExecutionContext } from '..'
+import { Logger } from '../../common'
 
 import * as _ from 'lodash'
 
@@ -9,8 +10,9 @@ export class BaseComposer {
     protected authenticationStrategy: AuthenticationStrategies = AuthenticationStrategies.none
 
     public constructor(protected executionContext: ExecutionContext, 
-        protected composerDef: ComposerDefSchema) {
-            this.definition = executionContext.definition
+        protected composerDef: ComposerDefSchema, protected correlationId: string, protected logger: Logger) {
+
+        this.definition = executionContext.definition
         
         if (composerDef && composerDef.args && composerDef.args.length > 0) {
             const record: KeyValuePair = _.find(composerDef.args, { key: 'auth'} )
@@ -28,7 +30,7 @@ export class BaseComposer {
     }
 
     public fx(): Promise<any> {
-        console.info('BaseComposer Ran')
+        this.logger.warn(this.correlationId, `BaseComposer Ran for definition ${this.definition.id}`, `BaseComposer.fx`)
         return Promise.resolve({})
     }
 

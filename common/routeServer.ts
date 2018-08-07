@@ -1,18 +1,18 @@
 import * as restify from 'restify'
 import * as config from 'config'
 
-import { ILogger } from '../src/schemas'
+import { Logger } from '../common'
 
 export class RouteServer {
 
     private restifyServer: any;
 
-    constructor(private logger: ILogger) {}
+    constructor(private logger: Logger) {}
 
     public init(): any {
 
         let options = {};
-        this.logger.info(`Initializing RouteService`)
+        this.logger.info(`server`, `Initializing RouteService`, `RouteServer.init`)
         if (!process.env.PRODUCTION) {
             options = {
                 formatters: {
@@ -43,7 +43,7 @@ export class RouteServer {
         }
         
         this.restifyServer.listen(thePort, () => {
-            this.logger.info(`${this.restifyServer.name} listening at ${this.restifyServer.url}`)
+            this.logger.info(`server`, `${this.restifyServer.name} listening at ${this.restifyServer.url}`, `RouteServer.start`)
         })
 
     }

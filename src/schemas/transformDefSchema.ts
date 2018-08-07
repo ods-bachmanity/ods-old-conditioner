@@ -1,4 +1,4 @@
-import { KeyValuePair } from "./";
+import { KeyValuePair } from ".";
 
 export class TransformDefSchema {
     public className: string

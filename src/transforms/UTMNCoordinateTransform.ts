@@ -1,6 +1,6 @@
-import { ExecutionContext } from '../'
+import { ExecutionContext } from '..'
 import { TransformDefSchema } from '../schemas'
-import { BaseTransform } from './'
+import { BaseTransform } from '.'
 import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
@@ -9,14 +9,8 @@ export class UTMNCoordinateTransform extends BaseTransform {
 
     private _servicePath = process.env.COORDINATECONVERSIONSERVICEURL;
 
-    constructor(protected executionContext: ExecutionContext, protected transformDef: TransformDefSchema, protected fieldName: string) {
-        super(executionContext, transformDef, fieldName)
-    }
-
     public fx(): Promise<boolean> {
         
-        // console.log(`UTM-N Transform running for ${this.fieldName}`)
-
         const result: Promise<boolean> = new Promise(async (resolve, reject) => {
 
             try {
@@ -95,7 +89,7 @@ export class UTMNCoordinateTransform extends BaseTransform {
 
             }
             catch (err) {
-                ErrorHandler.logError(`utmnCoordinateTransform.fx.error:`, err)
+                ErrorHandler.logError(this.correlationId, `utmnCoordinateTransform.fx.error:`, err)
                 return reject(false)
             }
         })
@@ -124,7 +118,7 @@ export class UTMNCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                ErrorHandler.logError('utmnCoordinateTransform.callService.error:', err)
+                ErrorHandler.logError(this.correlationId, 'utmnCoordinateTransform.callService.error:', err)
                 return reject(false)
             }
         })

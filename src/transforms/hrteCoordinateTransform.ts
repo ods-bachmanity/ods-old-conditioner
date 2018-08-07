@@ -1,6 +1,6 @@
-import { ExecutionContext } from '../'
+import { ExecutionContext } from '..'
 import { TransformDefSchema } from '../schemas'
-import { BaseTransform } from './'
+import { BaseTransform } from '.'
 import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
@@ -8,10 +8,6 @@ const rp = require('request-promise')
 export class HRTECoordinateTransform extends BaseTransform {
 
     private _servicePath = process.env.COORDINATECONVERSIONSERVICEURL;
-
-    constructor(protected executionContext: ExecutionContext, protected transformDef: TransformDefSchema, protected fieldName: string) {
-        super(executionContext, transformDef, fieldName)
-    }
 
     public fx(): Promise<boolean> {
 
@@ -33,7 +29,7 @@ export class HRTECoordinateTransform extends BaseTransform {
                     zoneLength = 1
                 }
                 else {
-                    console.log('ERROR:hrteCoordinateTransform.fx: UTMZone field malformed')
+                    this.logger.error(this.correlationId, 'ERROR:hrteCoordinateTransform.fx: UTMZone field malformed', 'HRTECoordinateTransform.fx')
                     return reject(false)
                 }
                 // Get UTM Zone and Hemisphere
@@ -100,8 +96,6 @@ export class HRTECoordinateTransform extends BaseTransform {
                     }
                 }
     
-                //console.log(myNewInstance)
-    
                 // # Pass to coordinate conversion service.
                 const body = await this.callService(myNewInstance)
                 if (body && body.Coordinates) {
@@ -113,7 +107,7 @@ export class HRTECoordinateTransform extends BaseTransform {
         
             }
             catch (err) {
-                ErrorHandler.logError(`hrteCoordinateTransform.fx.error:`, err)
+                ErrorHandler.logError(this.correlationId, `hrteCoordinateTransform.fx.error:`, err)
                 return reject(false)
             }
         })
@@ -142,7 +136,7 @@ export class HRTECoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                ErrorHandler.logError('hrteCoordinateTransform.callService.error:', err)
+                ErrorHandler.logError(this.correlationId, 'hrteCoordinateTransform.callService.error:', err)
                 return reject(false)
             }
             

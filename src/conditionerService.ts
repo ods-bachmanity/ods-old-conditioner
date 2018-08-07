@@ -1,10 +1,10 @@
-import { ErrorHandler } from '../common'
+import { ErrorHandler, Logger } from '../common'
 import { ConditionerResponseSchema } from './schemas'
-import { ExecutionContext } from './';
+import { ExecutionContext } from '.';
 
 export class ConditionerService {
     
-    constructor() {}
+    constructor(private logger: Logger) {}
 
     public execute(definitionId: string, requestContext: any): Promise<ConditionerResponseSchema> {
 
@@ -12,7 +12,7 @@ export class ConditionerService {
 
             try {
 
-                const executionContext: ExecutionContext = new ExecutionContext(definitionId, requestContext)
+                const executionContext: ExecutionContext = new ExecutionContext(definitionId, requestContext, this.logger)
     
                 const activity = executionContext.execute()
 
@@ -22,7 +22,7 @@ export class ConditionerService {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(400, requestContext.body.fileuri, requestContext.body.fingerprint,
                     requestContext.body.version, err, [], definitionId, {})
-                ErrorHandler.logError(`ConditionerService.execute(${definitionId}).error:`, handleError)
+                ErrorHandler.logError(requestContext.id(), `ConditionerService.execute(${definitionId}).error:`, handleError)
                 return reject(handleError)
             }
 

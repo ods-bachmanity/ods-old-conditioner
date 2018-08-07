@@ -1,6 +1,7 @@
 import { BaseComposer, ElasticSearchComposer, TestComposer } from '.'
 import { ComposerDefSchema } from '../schemas'
-import { ExecutionContext } from '../'
+import { ExecutionContext } from '..'
+import { Logger } from '../../common'
 
 export class ComposerFactory {
 
@@ -9,17 +10,17 @@ export class ComposerFactory {
         TestComposer
     }
 
-    constructor() {}
+    constructor(private logger: Logger) {}
 
-    public CreateInstance(executionContext: ExecutionContext, composerDef: ComposerDefSchema): BaseComposer {
+    public CreateInstance(executionContext: ExecutionContext, composerDef: ComposerDefSchema, correlationId: string): BaseComposer {
 
         const className = composerDef.className
         const theClass = this._objects[className]
         if (!theClass) {
-            console.error(`No record of object ${className}`)
-            return new BaseComposer(executionContext, composerDef)
+            this.logger.error(correlationId, `No record of object ${className}`, `ComposerFactory.CreateInstance`)
+            return new BaseComposer(executionContext, composerDef, correlationId, this.logger)
         }
-        return new theClass(executionContext, composerDef)
+        return new theClass(executionContext, composerDef, correlationId, this.logger)
 
     }
 

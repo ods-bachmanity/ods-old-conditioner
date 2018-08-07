@@ -1,4 +1,4 @@
-import { BaseTransform } from './'
+import { BaseTransform } from '.'
 import { CoordinateSchema } from '../schemas'
 import { ErrorHandler } from '../../common'
 

@@ -4,15 +4,15 @@ import * as _ from 'lodash'
 import * as path from 'path'
 
 import { DefinitionSchema } from './schemas'
-import { ErrorHandler } from '../common'
+import { ErrorHandler, Logger } from '../common'
 
 export class DefinitionService {
     
     private _defs: Array<DefinitionSchema> = []
 
-    constructor() {}
+    constructor(private logger: Logger) {}
 
-    public get(id: string): Promise<DefinitionSchema> {
+    public get(id: string, correlationId: string): Promise<DefinitionSchema> {
 
         const result: Promise<DefinitionSchema|any> = new Promise(async (resolve, reject) => {
 
@@ -33,12 +33,12 @@ export class DefinitionService {
             catch (err) {
                 let handleError
                 if (err.code === 'ENOENT') {
-                    console.log(`DefinitionService.get(${id}).error: Unable to find definition file @${filePath}`)
+                    this.logger.log(correlationId, `DefinitionService.get(${id}).error: Unable to find definition file @${filePath}`, `DefinitionService.get`)
                     handleError = ErrorHandler.errorResponse(404, null,null,null,err,[],id,{})
                     return reject(handleError)
                 }
                 handleError = ErrorHandler.errorResponse(500, null,null,null,err,[],id,{})
-                ErrorHandler.logError(`DefinitionService.get(${id}).error:`, handleError)
+                ErrorHandler.logError(correlationId, `DefinitionService.get(${id}).error:`, handleError)
                 return reject(handleError)
             }
 

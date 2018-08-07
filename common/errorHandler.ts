@@ -1,17 +1,18 @@
-import { ConditionerResponseSchema, ILogger } from '../src/schemas'
+import { ConditionerResponseSchema } from '../src/schemas'
+import { Logger } from './'
 
 export class ErrorHandler {
 
-    private static _logger: ILogger = null
+    private static _logger: Logger = null
 
-    constructor (private logger: ILogger) {
+    constructor (private logger: Logger) {
         ErrorHandler._logger = logger
     }
 
     init (server: any) {
 
         server.on('InternalError', (req, res, err, next) => {
-            ErrorHandler.logError(`Internal Error`, err)
+            ErrorHandler.logError(req.id(), `Internal Error`, err)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             res.send(500, ErrorHandler.internalErrorResponse(err))
@@ -19,7 +20,7 @@ export class ErrorHandler {
         })
 
         server.on('InternalServerError', (req, res, err, next) => {
-            ErrorHandler.logError(`Internal Server Error`, err)
+            ErrorHandler.logError(req.id(), `Internal Server Error`, err)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             res.send(500, ErrorHandler.internalErrorResponse(err))
@@ -27,7 +28,7 @@ export class ErrorHandler {
         })
 
         server.on('restifyError', (req, res, err, next) => {
-            ErrorHandler.logError(`Restify Error`, err)
+            ErrorHandler.logError(req.id(), `Restify Error`, err)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             res.send(500, ErrorHandler.internalErrorResponse(err))
@@ -35,7 +36,7 @@ export class ErrorHandler {
         })
 
         server.on('uncaughtException', (req, res, err, next) => {
-            ErrorHandler.logError(`Uncaught Exception`, err)
+            ErrorHandler.logError(req.id(), `Uncaught Exception`, err)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             res.send(500, ErrorHandler.internalErrorResponse(err))
@@ -44,12 +45,10 @@ export class ErrorHandler {
 
     }
 
-    public static logError(source: string, err: any) {
+    public static logError(id: string, source: string, err: any) {
 
-        const now = new Date()
-        const timeString = `${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getUTCSeconds()}:${now.getUTCMilliseconds()}`
         if (ErrorHandler._logger) {
-            ErrorHandler._logger.error(`${timeString}:> ERROR IN ${source} ${this.errorText(err)}`)
+            ErrorHandler._logger.error(id, `ERROR IN ${source}: ${this.errorText(err)}`, source)
         }
         return
 

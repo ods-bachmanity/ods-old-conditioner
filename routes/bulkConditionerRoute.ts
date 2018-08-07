@@ -1,10 +1,10 @@
 import { ConditionerResponseSchema } from '../src/schemas'
 import { ConditionerService } from '../src';
-import { ErrorHandler } from '../common'
+import { ErrorHandler, Logger } from '../common'
 
 export class BulkConditionerRoute {
     
-    public constructor (private server: any) {}
+    public constructor (private server: any, private logger: Logger) {}
 
     public init (path: string) {
 
@@ -12,11 +12,10 @@ export class BulkConditionerRoute {
 
             let definitionId = ''
             try {
-                res.contentType = 'application/json'
-                res.header('Content-Type', 'application/json')
     
                 if (!req.params || !req.params.definitionId) {
                     
+                    this.logger.warn(req.id(), `Missing definition id parameter`, `BulkConditionerRoute.init.post`)
                     res.send(400, ErrorHandler.errorResponse(400,null,null,null,'Missing definition id parameter',[],null,{}))
                     return next()
 
@@ -24,6 +23,7 @@ export class BulkConditionerRoute {
 
                 if (!req.body.files || req.body.files.length <= 0) {
 
+                    this.logger.warn(req.id(), `Invalid Request Body. Missing files item`, `BulkConditionerRoute.init.post`)
                     res.send(400, ErrorHandler.errorResponse(400,null,null,null,'Invalid Request Body. Missing files item',[],null,{}))
                     return next()
 
@@ -34,7 +34,7 @@ export class BulkConditionerRoute {
                 const workitems = []
                 const responses = []
                 req.body.files.forEach((item) => {
-                    const mockRequestBody = { body: item }
+                    const mockRequestBody = { body: item, id: req.id() }
                     workitems.push(this.executeRoute(definitionId, mockRequestBody).then((workItemResponse) => {
                         responses.push(Object.assign({}, workItemResponse))
                     }))
@@ -61,7 +61,7 @@ export class BulkConditionerRoute {
         
             }
             catch (err) {
-                ErrorHandler.logError(`BulkConditionerRoute.init.post(${path}).error:`, err)
+                ErrorHandler.logError(req.id(), `BulkConditionerRoute.init.post(${path}).error:`, err)
                 const errorResponse = ErrorHandler.errorResponse(400,null,null,null,err,[],definitionId,null)
                 res.send(errorResponse.httpStatus ? errorResponse.httpStatus : 400, errorResponse)
                 return next()
@@ -77,7 +77,7 @@ export class BulkConditionerRoute {
 
             try {
 
-                const conditionerService = new ConditionerService()
+                const conditionerService = new ConditionerService(this.logger)
                 
                 const records: ConditionerResponseSchema = await conditionerService.execute(definitionId, requestContext)
     
@@ -87,7 +87,7 @@ export class BulkConditionerRoute {
             catch (err) {
                 const handledError = ErrorHandler.errorResponse(500, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version,
                     err, [],definitionId, {})
-                ErrorHandler.logError(`bulkConditionerRoute.executeRoute.error:`, handledError)
+                ErrorHandler.logError(requestContext.id(), `bulkConditionerRoute.executeRoute.error:`, handledError)
                 return reject(handledError)
             }
 

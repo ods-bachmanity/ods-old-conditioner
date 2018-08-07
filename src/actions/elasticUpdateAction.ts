@@ -1,4 +1,4 @@
-import { BaseAction } from './'
+import { BaseAction } from '.'
 import { AuthenticationStrategies } from '../schemas'
 import { ErrorHandler } from '../../common'
 
@@ -55,7 +55,7 @@ export class ElasticUpdateAction extends BaseAction {
                 const handleError = ErrorHandler.errorResponse(500,this.executionContext.getParameterValue('fileuri'),
                 this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), err, 
                 this.executionContext.warnings,this.executionContext.definition.id,{})
-                ErrorHandler.logError(`elasticUpdateAction.fx`, handleError)
+                ErrorHandler.logError(this.correlationId, `elasticUpdateAction.fx`, handleError)
                 // TODO: Error Handling
                 this.executionContext.mapped.ods.conditioners[this.executionContext.definition.id] = {
                     version: '0.0.1',

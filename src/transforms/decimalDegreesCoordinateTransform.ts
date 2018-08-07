@@ -1,12 +1,10 @@
-import { BaseTransform } from './'
+import { BaseTransform } from '.'
 import { CoordinateSchema } from '../schemas'
 import { ErrorHandler } from '../../common'
 
 export class DecimalDegreesCoordinateTransform extends BaseTransform {
 
     public fx(): Promise<Boolean> {
-
-        // console.log('I am transforming Decimal Degree coordinates.')
 
         const result: Promise<boolean> = new Promise((resolve, reject) => {
 
@@ -88,7 +86,7 @@ export class DecimalDegreesCoordinateTransform extends BaseTransform {
 
             }
             catch (err) {
-                ErrorHandler.logError(`DecimalDegreesCoordinateTransform.fx().error:`, err)
+                ErrorHandler.logError(this.correlationId, `DecimalDegreesCoordinateTransform.fx().error:`, err)
                 return reject(false)
             }
 

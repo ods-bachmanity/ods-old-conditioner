@@ -1,11 +1,11 @@
 import { BaseComposer } from '.'
-import { AuthenticationStrategies } from '../schemas'
-import { ErrorHandler } from '../../common'
+import { AuthenticationStrategies, ComposerDefSchema } from '../schemas'
+import { ErrorHandler, Logger } from '../../common'
+import { ExecutionContext } from '../'
 
 import * as rp from 'request-promise'
 
 export class ElasticSearchComposer extends BaseComposer {
-
 
     public fx(): Promise<any> {
         
@@ -46,11 +46,10 @@ export class ElasticSearchComposer extends BaseComposer {
                     this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), 
                     `Missing critical parameter in Request body`, 
                     this.executionContext.warnings,this.executionContext.definition.id,{})
-                    ErrorHandler.logError(`elasticSearchComposer.fx()`, handleError)
+                    ErrorHandler.logError(this.correlationId, `elasticSearchComposer.fx()`, handleError)
                     return reject(handleError)
                 }
                 
-                // console.info(`Calling ${JSON.stringify(endpoint, null, 2)}`)
                 const response = await rp(endpoint)
                 const body = JSON.parse(response)
 
@@ -59,7 +58,7 @@ export class ElasticSearchComposer extends BaseComposer {
                     this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), 
                     `No record returned for request`, 
                     this.executionContext.warnings,this.executionContext.definition.id,{})
-                    ErrorHandler.logError(`elasticSearchComposer.fx()`, handleError)
+                    ErrorHandler.logError(this.correlationId, `elasticSearchComposer.fx()`, handleError)
                     return reject(handleError)
                 }
                 if (body.code && body.code !== 0) {
@@ -67,7 +66,7 @@ export class ElasticSearchComposer extends BaseComposer {
                     this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), 
                     `Error retrieving record for request`, 
                     this.executionContext.warnings,this.executionContext.definition.id,{})
-                    ErrorHandler.logError(`elasticSearchComposer.fx():Error retrieving record for request:\n ${JSON.stringify(body, null, 1)}`, handleError)
+                    ErrorHandler.logError(this.correlationId, `elasticSearchComposer.fx():Error retrieving record for request:\n ${JSON.stringify(body, null, 1)}`, handleError)
                     return reject(handleError)
                 }
                 if (!body 
@@ -80,7 +79,7 @@ export class ElasticSearchComposer extends BaseComposer {
                         this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), 
                         `Invalid Record Format returned from Elastic Search`, 
                         this.executionContext.warnings,this.executionContext.definition.id,{})
-                        ErrorHandler.logError(`elasticSearchComposer.fx():Invalid Record Format returned from Elastic Search:\n ${JSON.stringify(body,null,1)} `, handleError)
+                        ErrorHandler.logError(this.correlationId, `elasticSearchComposer.fx():Invalid Record Format returned from Elastic Search:\n ${JSON.stringify(body,null,1)} `, handleError)
                         return reject(handleError)
                 }
                 if (body.hits.total !== 1) {
@@ -88,7 +87,7 @@ export class ElasticSearchComposer extends BaseComposer {
                     this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), 
                     `Invalid number of responses from Elastic Search returned`, 
                     this.executionContext.warnings,this.executionContext.definition.id,{})
-                    ErrorHandler.logError(`elasticSearchComposer.fx():Invalid number of respones from Elastic Search returned:\n ${JSON.stringify(body,null,1)}`, handleError)
+                    ErrorHandler.logError(this.correlationId, `elasticSearchComposer.fx():Invalid number of respones from Elastic Search returned:\n ${JSON.stringify(body,null,1)}`, handleError)
                     return reject(handleError)
                 }
 
@@ -101,7 +100,7 @@ export class ElasticSearchComposer extends BaseComposer {
                 this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), 
                 `Error executing elasticSearchComposer.fx():`, 
                 this.executionContext.warnings,this.executionContext.definition.id,{})
-                ErrorHandler.logError(`elasticSearchComposer.fx()`, handleError)
+                ErrorHandler.logError(this.correlationId, `elasticSearchComposer.fx()`, handleError)
                 return reject(handleError)
             }
         })

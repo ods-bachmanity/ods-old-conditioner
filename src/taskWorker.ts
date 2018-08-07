@@ -1,6 +1,6 @@
 import { FieldSchema, TransformDefSchema } from './schemas'
-import { ExecutionContext } from './'
-import { ErrorHandler, Utilities } from '../common'
+import { ExecutionContext } from '.'
+import { ErrorHandler, Utilities, Logger } from '../common'
 import { isNullOrUndefined } from 'util';
 import { TransformFactory } from './transforms';
 
@@ -9,9 +9,9 @@ import * as _ from 'lodash'
 export class TaskWorker {
 
     private _utilities = new Utilities()
-    private _transformFactory = new TransformFactory()
+    private _transformFactory = new TransformFactory(this.logger)
 
-    public constructor(private executionContext: ExecutionContext, private fieldSchema: FieldSchema) {}
+    public constructor(private executionContext: ExecutionContext, private fieldSchema: FieldSchema, private correlationId: string, private logger: Logger) {}
 
     public execute(): Promise<any> {
 
@@ -67,7 +67,7 @@ export class TaskWorker {
                 // EXECUTE ANY TRANSFORMS FROM CASE OR TRANSFORMS COLLECTION
                 // First we run transforms from any case field
                 if (matchedCaseRecord) {
-                    const transform = this._transformFactory.CreateInstance(this.executionContext, matchedCaseRecord, this.fieldSchema.field)
+                    const transform = this._transformFactory.CreateInstance(this.executionContext, matchedCaseRecord, this.fieldSchema.field, this.correlationId)
                     const caseResult = await transform.fx()
                     if (!caseResult) {
                         return reject(`A problem occurred while running transform ${matchedCaseRecord.className}`)
@@ -78,7 +78,7 @@ export class TaskWorker {
                 if (this.fieldSchema.transforms && this.fieldSchema.transforms.length > 0) {
                     const tasks = []
                     this.fieldSchema.transforms.forEach((transform: TransformDefSchema) => {
-                        const instance = this._transformFactory.CreateInstance(this.executionContext, transform, this.fieldSchema.field)
+                        const instance = this._transformFactory.CreateInstance(this.executionContext, transform, this.fieldSchema.field, this.correlationId)
                         tasks.push(instance.fx())
                     })
                     const response = await Promise.all(tasks)
@@ -91,7 +91,7 @@ export class TaskWorker {
                 if (this.fieldSchema.after && this.fieldSchema.after.length > 0) {
                     const tasks = []
                     this.fieldSchema.after.forEach((transform: TransformDefSchema) => {
-                        const instance = this._transformFactory.CreateInstance(this.executionContext, transform, this.fieldSchema.field)
+                        const instance = this._transformFactory.CreateInstance(this.executionContext, transform, this.fieldSchema.field, this.correlationId)
                         tasks.push(instance.fx())
                     })
                     const response = await Promise.all(tasks)
@@ -108,7 +108,7 @@ export class TaskWorker {
                 this.executionContext.getParameterValue('fingerprint'),this.executionContext.getParameterValue('version'), err, 
                 this.executionContext.warnings,this.executionContext.definition.id,{})
 
-                ErrorHandler.logError(`TaskWorker.execute().error:`, handleError)
+                ErrorHandler.logError(this.correlationId, `TaskWorker.execute().error:`, handleError)
                 return reject(handleError)
             }
 

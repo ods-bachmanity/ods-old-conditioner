@@ -1,5 +1,6 @@
 import { DefinitionSchema, TransformDefSchema, CoordinateSchema } from '../schemas'
-import { ExecutionContext } from '../'
+import { ExecutionContext } from '..'
+import { Logger } from '../../common'
 
 import * as _ from 'lodash'
 
@@ -9,14 +10,14 @@ export class BaseTransform {
     
     public constructor(protected executionContext: ExecutionContext, 
         protected transformDef: TransformDefSchema,
-        protected fieldName: string) {
+        protected fieldName: string, protected correlationId: string, protected logger: Logger) {
 
             this.definition = executionContext.definition
         
     }
 
     public fx(): Promise<Boolean> {
-        console.info('Base Transform Ran')
+        this.logger.warn(this.correlationId, `Base Transform Ran for ${this.fieldName}`, `BaseTransform.fx`)
         return Promise.resolve(true)
     }
 

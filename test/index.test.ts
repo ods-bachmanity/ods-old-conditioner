@@ -20,7 +20,7 @@ describe('Definition Service, getDefinition for ntf-2', async () => {
         const defType = 'ntf-2'
         const result = new Promise(async (resolve, reject) => {
             try {
-                const response = await definitionService.get(defType)
+                const response = await definitionService.get(defType, 'TEST')
                 console.log(`\n${JSON.stringify({
                     id: response.id,
                     parameterCount: response.parameters.length,

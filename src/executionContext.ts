@@ -1,7 +1,7 @@
 import { DefinitionSchema, ComposerDefSchema, FieldSchema, MapDefSchema, ActionDefSchema, ConditionerResponseSchema } from './schemas'
 import { ComposerFactory, BaseComposer } from './composers'
-import { ErrorHandler, Utilities } from '../common'
-import { TaskWorker, DefinitionService } from './'
+import { ErrorHandler, Utilities, Logger } from '../common'
+import { TaskWorker, DefinitionService } from '.'
 
 import * as config from 'config'
 import * as _ from 'lodash'
@@ -20,12 +20,13 @@ export class ExecutionContext {
     public warnings: Array<string> = []
     public errors: Array<string> = []
 
-    private static _definitionService = new DefinitionService()
+    private static _definitionService = null
     private _definition: DefinitionSchema = null
     private _utilities = new Utilities()
 
-    public constructor(private definitionId: string, private requestContext: any) {
+    public constructor(private definitionId: string, private requestContext: any, private logger: Logger) {
         // GET DEFINITION FOR EXECUTION
+        ExecutionContext._definitionService = new DefinitionService(this.logger)
     }
 
     public get definition() {
@@ -39,7 +40,7 @@ export class ExecutionContext {
             try {
 
                 if (this._definition) return resolve(this._definition)
-                this._definition = await ExecutionContext._definitionService.get(this.definitionId)
+                this._definition = await ExecutionContext._definitionService.get(this.definitionId, this.requestContext.id())
                 if (!this._definition) {
                     throw new Error(`Invalid Definition Id`)
                 }
@@ -50,7 +51,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(400,this.requestContext.body.fileuri,
                 this.requestContext.body.fingerprint, this.requestContext.body.version, err, this.warnings, this.definitionId, {})
-                ErrorHandler.logError(`ExecutionContext.resolveDefinition.error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id, `ExecutionContext.resolveDefinition.error:`, handleError)
                 return reject(handleError)
             }
 
@@ -78,7 +79,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.requestContext.body.fileuri,
                     this.requestContext.body.fingerprint, this.requestContext.body.version, err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(`ExecutionContext.initialize.error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.initialize.error:`, handleError)
                 return reject(handleError)
             }
         })
@@ -138,14 +139,12 @@ export class ExecutionContext {
                     const result = this._internalAddParameter(key, value, req)
                     if (result) {
                         isValueSet = true
-                        // console.log(`Setting ${key} to ${result}`)
                     }
                 }
             })
             return
         }
         const result = this._internalAddParameter(key, value, req)
-        // console.log(`Setting ${key} to ${result}`)
     }
 
     private compose(): Promise<any> {
@@ -158,11 +157,11 @@ export class ExecutionContext {
                     await this.initialize()
                 }
                 // COMPOSE DOCUMENT SOURCES
-                const composerFactory = new ComposerFactory()
+                const composerFactory = new ComposerFactory(this.logger)
 
                 const composers: Array<any> = []
                 this._definition.composers.forEach((composerDef: ComposerDefSchema) => {
-                    const composerInstance: BaseComposer = composerFactory.CreateInstance(this, composerDef)
+                    const composerInstance: BaseComposer = composerFactory.CreateInstance(this, composerDef, this.requestContext.id())
                     if (composerInstance) {
                         composers.push(composerInstance.fx())
                     }
@@ -182,7 +181,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(`ExecutionContext.compose().error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.compose().error:`, handleError)
                 return reject(handleError)
             }
         })
@@ -214,7 +213,7 @@ export class ExecutionContext {
                         keepGoing = false
                     } else {
                         fields.forEach((field: FieldSchema) => {
-                            const taskWorker = new TaskWorker(this, field)
+                            const taskWorker = new TaskWorker(this, field, this.requestContext.id(), this.logger)
                             tasks.push(taskWorker.execute())
                         })
                         const response = await Promise.all(tasks)
@@ -227,7 +226,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(`ExecutionContext.schema().error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.schema().error:`, handleError)
                 return reject(handleError)
             }
         })
@@ -266,7 +265,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(`ExecutionContext.map().error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.map().error:`, handleError)
                 return reject(handleError)
             }
 
@@ -286,13 +285,13 @@ export class ExecutionContext {
                     await this.initialize()
                 }
                 const actions = this._definition.actions
-                const actionFactory = new ActionFactory()
+                const actionFactory = new ActionFactory(this.logger)
 
                 if (actions && actions.length > 0) {
 
                     const tasks: Array<any> = []
                     actions.forEach((actionDef: ActionDefSchema) => {
-                        const action = actionFactory.CreateInstance(this, actionDef)
+                        const action = actionFactory.CreateInstance(this, actionDef, this.requestContext.id())
                         tasks.push(action.fx())
                     })
                     const responses = await Promise.all(tasks)
@@ -309,7 +308,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(`ExecutionContext.act().error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.act().error:`, handleError)
                 return reject(handleError)
             }
 
@@ -340,7 +339,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(`ExecutionContext.respond.error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.respond.error:`, handleError)
                 return reject(handleError)
             }    
 

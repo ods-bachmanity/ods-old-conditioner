@@ -1,9 +1,10 @@
 import {
     BaseAction,
     ElasticUpdateAction
-} from './'
+} from '.'
 import { ActionDefSchema } from '../schemas'
-import { ExecutionContext } from '../'
+import { ExecutionContext } from '..'
+import { Logger } from '../../common'
 
 export class ActionFactory {
 
@@ -11,17 +12,17 @@ export class ActionFactory {
         ElasticUpdateAction
     }
 
-    constructor() {}
+    constructor(private logger: Logger) {}
 
-    public CreateInstance(executionContext: ExecutionContext, actionDef: ActionDefSchema): BaseAction {
+    public CreateInstance(executionContext: ExecutionContext, actionDef: ActionDefSchema, correlationId: string): BaseAction {
 
         const className = actionDef.className
         const theClass = this._objects[className]
         if (!theClass) {
-            console.error(`No record of object ${className}`)
-            return new BaseAction(executionContext, actionDef)
+            this.logger.error(correlationId, `No record of object ${className}`, `ActionFactory.CreateInstance`)
+            return new BaseAction(executionContext, actionDef, correlationId, this.logger)
         }
-        return new theClass(executionContext, actionDef)
+        return new theClass(executionContext, actionDef, correlationId, this.logger)
 
     }
 }

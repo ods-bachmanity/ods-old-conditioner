@@ -1,5 +1,5 @@
-import { BaseTransform } from './'
-import { ExecutionContext } from '../'
+import { BaseTransform } from '.'
+import { ExecutionContext } from '..'
 import { TransformDefSchema } from '../schemas'
 import { ErrorHandler } from '../../common'
 
@@ -8,10 +8,6 @@ const rp = require('request-promise')
 export class CountryCodeTransform extends BaseTransform {
 
     private _servicePath: string = process.env.COUNTRYCODESERVICEURL
-
-    constructor(executionContext: ExecutionContext, transformDef: TransformDefSchema, fieldName: string) {
-        super(executionContext, transformDef, fieldName)
-    }
 
     public fx(): Promise<Boolean> {
 
@@ -38,7 +34,7 @@ export class CountryCodeTransform extends BaseTransform {
                 return resolve(true)
             }
             catch (err) {
-                ErrorHandler.logError(`CountryCodeTransform.fx().error:`, err)
+                ErrorHandler.logError(this.correlationId, `CountryCodeTransform.fx().error:`, err)
                 return reject(false)
             }
             
@@ -70,7 +66,7 @@ export class CountryCodeTransform extends BaseTransform {
     
             }
             catch (err) {
-                ErrorHandler.logError(`countryCodeTransform.callService.error:`, err);
+                ErrorHandler.logError(this.correlationId, `countryCodeTransform.callService.error:`, err);
                 return reject(false);
             }
             

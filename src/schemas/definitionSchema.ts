@@ -1,4 +1,4 @@
-import { ComposerDefSchema, FieldSchema, KeyValuePair, MapDefSchema, ActionDefSchema } from './'
+import { ComposerDefSchema, FieldSchema, KeyValuePair, MapDefSchema, ActionDefSchema } from '.'
 
 export class DefinitionSchema {
     public id: string

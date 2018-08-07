@@ -1,11 +1,11 @@
 import { DefinitionService } from '../src'
-import { ErrorHandler } from '../common'
+import { ErrorHandler, Logger } from '../common'
 
 export class DefinitionRoute {
     
-    private _definitionService = new DefinitionService()
+    private _definitionService = new DefinitionService(this.logger)
 
-    public constructor (private server: any) {
+    public constructor (private server: any, private logger: Logger) {
 
     }
 
@@ -22,13 +22,13 @@ export class DefinitionRoute {
                 }
 
                 const id = req.params.id
-                const result = await this._definitionService.get(id)
+                const result = await this._definitionService.get(id, req.id())
                 res.send(200, result)
             
                 return next()     
             }
             catch (err) {
-                ErrorHandler.logError(`DefinitionRoute.init.get(${path}).error:`, err)
+                ErrorHandler.logError(req.id(), `DefinitionRoute.init.get(${path}).error:`, err)
                 
                 res.send(err.httpStatus ? err.httpStatus : 500, err)
                 return next()

@@ -26,10 +26,6 @@ export class Utilities {
         
         const env = require("dotenv").config()
         
-        // console.log(JSON.stringify(Utilities.environmentVariables([],[]), null, 2))
-        
-        // TODO: Ensure env variable values exist
-
         return allGood
         
     }

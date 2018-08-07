@@ -1,9 +1,9 @@
 import { SwaggerService } from '../common'
-import { ErrorHandler } from '../common'
+import { ErrorHandler, Logger } from '../common'
 
 export class SwaggerRoute {
     
-    public constructor (private server: any) {}
+    public constructor (private server: any, private logger: Logger) {}
 
     public init (path: string) {
 
@@ -21,7 +21,7 @@ export class SwaggerRoute {
                 return next();        
             }
             catch (err) {
-                ErrorHandler.logError(`SwaggerRoute.init.get(${path}).error:`, err)
+                ErrorHandler.logError(req.id(), `SwaggerRoute.init.get(${path}).error:`, err)
                 
                 res.send(500, err)
                 return next()

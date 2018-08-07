@@ -1,6 +1,6 @@
-import { ExecutionContext } from '../'
+import { ExecutionContext } from '..'
 import { TransformDefSchema } from '../schemas'
-import { BaseTransform } from './'
+import { BaseTransform } from '.'
 import { ErrorHandler } from '../../common'
 
 const rp = require('request-promise')
@@ -9,13 +9,7 @@ export class GeographicCoordinateTransform extends BaseTransform {
 
     private _servicePath: string = process.env.COORDINATECONVERSIONSERVICEURL
 
-    constructor(protected executionContext: ExecutionContext, protected transformDef: TransformDefSchema, protected fieldName: string) {
-        super(executionContext, transformDef, fieldName)
-    }
-
     public fx(): Promise<Boolean> {
-
-        // console.log(`Geographic Transform running for ${this.fieldName}`)
 
         const result: Promise<boolean> = new Promise(async (resolve, reject) => {
 
@@ -74,7 +68,7 @@ export class GeographicCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                ErrorHandler.logError(`geographicCoordinateTransform.fx.error:`, err)
+                ErrorHandler.logError(this.correlationId, `geographicCoordinateTransform.fx.error:`, err)
                 return reject(false)
             }
 
@@ -104,7 +98,7 @@ export class GeographicCoordinateTransform extends BaseTransform {
     
             }
             catch (err) {
-                ErrorHandler.logError('geographicCoordinateTransform.callService.error:', err)
+                ErrorHandler.logError(this.correlationId, 'geographicCoordinateTransform.callService.error:', err)
                 return reject(false)
             }
             

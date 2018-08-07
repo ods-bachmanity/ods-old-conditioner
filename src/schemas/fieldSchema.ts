@@ -1,4 +1,4 @@
-import { TransformDefSchema } from './'
+import { TransformDefSchema } from '.'
 
 export class FieldSchema {
     public field: string

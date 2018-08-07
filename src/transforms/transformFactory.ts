@@ -8,9 +8,10 @@ import {
     UTMSCoordinateTransform,
     HRTECoordinateTransform,
     CoordinateTransform
-} from './'
+} from '.'
 import { TransformDefSchema } from '../schemas'
-import { ExecutionContext } from '../'
+import { ExecutionContext } from '..'
+import { Logger } from '../../common'
 
 export class TransformFactory {
 
@@ -25,17 +26,17 @@ export class TransformFactory {
         CoordinateTransform
     }
 
-    constructor() {}
+    constructor(private logger: Logger) {}
 
-    public CreateInstance(executionContext: ExecutionContext, transformDef: TransformDefSchema, fieldName: string): BaseTransform {
+    public CreateInstance(executionContext: ExecutionContext, transformDef: TransformDefSchema, fieldName: string, correlationId: string): BaseTransform {
 
         const className = transformDef.className
         const theClass = this._objects[className]
         if (!theClass) {
-            console.error(`No record of object ${className}`)
-            return new BaseTransform(executionContext, transformDef, fieldName)
+            this.logger.error(correlationId, `No record of transform object ${className}`, `TransformFactory.CreateInstance`)
+            return new BaseTransform(executionContext, transformDef, fieldName, correlationId, this.logger)
         }
-        return new theClass(executionContext, transformDef, fieldName)
+        return new theClass(executionContext, transformDef, fieldName, correlationId, this.logger)
 
     }
 
