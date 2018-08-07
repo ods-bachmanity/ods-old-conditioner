@@ -1,6 +1,6 @@
 {
   "name": "ods-conditioner",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Transform and Map metadata from and back to Elastic Search",
   "main": "index.js",
   "scripts": {
