@@ -3,7 +3,7 @@
         "comments": "these settings apply for any build UNLESS there is a prod or dev field.",
         "package": {
             "name": "ods-conditioner",
-            "version": "1.0.0",
+            "version": "0.2.0",
             "description": "Condition Metadata from image headers and update elastic catalog",
             "main": "index.js",
             "scripts": {
