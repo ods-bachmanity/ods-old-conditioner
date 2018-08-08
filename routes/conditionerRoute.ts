@@ -21,7 +21,11 @@ export class ConditionerRoute {
                     return next()
                 }
                 definitionId = req.params.definitionId
-                const result = await this.executeRoute(definitionId, req)
+                const mockRequest = {
+                    body: req.body,
+                    id: req.id()
+                }
+                const result = await this.executeRoute(definitionId, mockRequest)
                 
                 res.send(200, result)
             
@@ -54,7 +58,7 @@ export class ConditionerRoute {
             catch (err) {
                 const handledError = ErrorHandler.errorResponse(500, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version,
                     err, [],definitionId, {})
-                    ErrorHandler.logError(requestContext.id(), `conditionerRoute.executeRoute.error:`, handledError)
+                    ErrorHandler.logError(requestContext.id, `conditionerRoute.executeRoute.error:`, handledError)
                     return reject(handledError)
             }
 

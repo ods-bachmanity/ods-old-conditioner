@@ -40,7 +40,7 @@ export class ExecutionContext {
             try {
 
                 if (this._definition) return resolve(this._definition)
-                this._definition = await ExecutionContext._definitionService.get(this.definitionId, this.requestContext.id())
+                this._definition = await ExecutionContext._definitionService.get(this.definitionId, this.requestContext.id)
                 if (!this._definition) {
                     throw new Error(`Invalid Definition Id`)
                 }
@@ -79,7 +79,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.requestContext.body.fileuri,
                     this.requestContext.body.fingerprint, this.requestContext.body.version, err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.initialize.error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id, `ExecutionContext.initialize.error:`, handleError)
                 return reject(handleError)
             }
         })
@@ -161,7 +161,7 @@ export class ExecutionContext {
 
                 const composers: Array<any> = []
                 this._definition.composers.forEach((composerDef: ComposerDefSchema) => {
-                    const composerInstance: BaseComposer = composerFactory.CreateInstance(this, composerDef, this.requestContext.id())
+                    const composerInstance: BaseComposer = composerFactory.CreateInstance(this, composerDef, this.requestContext.id)
                     if (composerInstance) {
                         composers.push(composerInstance.fx())
                     }
@@ -181,7 +181,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.compose().error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id, `ExecutionContext.compose().error:`, handleError)
                 return reject(handleError)
             }
         })
@@ -213,7 +213,7 @@ export class ExecutionContext {
                         keepGoing = false
                     } else {
                         fields.forEach((field: FieldSchema) => {
-                            const taskWorker = new TaskWorker(this, field, this.requestContext.id(), this.logger)
+                            const taskWorker = new TaskWorker(this, field, this.requestContext.id, this.logger)
                             tasks.push(taskWorker.execute())
                         })
                         const response = await Promise.all(tasks)
@@ -226,7 +226,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.schema().error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id, `ExecutionContext.schema().error:`, handleError)
                 return reject(handleError)
             }
         })
@@ -265,7 +265,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.map().error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id, `ExecutionContext.map().error:`, handleError)
                 return reject(handleError)
             }
 
@@ -291,7 +291,7 @@ export class ExecutionContext {
 
                     const tasks: Array<any> = []
                     actions.forEach((actionDef: ActionDefSchema) => {
-                        const action = actionFactory.CreateInstance(this, actionDef, this.requestContext.id())
+                        const action = actionFactory.CreateInstance(this, actionDef, this.requestContext.id)
                         tasks.push(action.fx())
                     })
                     const responses = await Promise.all(tasks)
@@ -308,7 +308,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.act().error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id, `ExecutionContext.act().error:`, handleError)
                 return reject(handleError)
             }
 
@@ -339,7 +339,7 @@ export class ExecutionContext {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(500,this.getParameterValue('fileuri'),
                 this.getParameterValue('fingerprint'),this.getParameterValue('version'), err, this.warnings,this.definitionId,{})
-                ErrorHandler.logError(this.requestContext.id(), `ExecutionContext.respond.error:`, handleError)
+                ErrorHandler.logError(this.requestContext.id, `ExecutionContext.respond.error:`, handleError)
                 return reject(handleError)
             }    
 

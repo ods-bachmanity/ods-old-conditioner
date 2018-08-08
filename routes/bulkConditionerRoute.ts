@@ -87,7 +87,7 @@ export class BulkConditionerRoute {
             catch (err) {
                 const handledError = ErrorHandler.errorResponse(500, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version,
                     err, [],definitionId, {})
-                ErrorHandler.logError(requestContext.id(), `bulkConditionerRoute.executeRoute.error:`, handledError)
+                ErrorHandler.logError(requestContext.id, `bulkConditionerRoute.executeRoute.error:`, handledError)
                 return reject(handledError)
             }
 

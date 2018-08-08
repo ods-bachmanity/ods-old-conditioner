@@ -22,7 +22,7 @@ export class ConditionerService {
             catch (err) {
                 const handleError = ErrorHandler.errorResponse(400, requestContext.body.fileuri, requestContext.body.fingerprint,
                     requestContext.body.version, err, [], definitionId, {})
-                ErrorHandler.logError(requestContext.id(), `ConditionerService.execute(${definitionId}).error:`, handleError)
+                ErrorHandler.logError(requestContext.id, `ConditionerService.execute(${definitionId}).error:`, handleError)
                 return reject(handleError)
             }
 
