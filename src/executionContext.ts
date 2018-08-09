@@ -26,7 +26,9 @@ export class ExecutionContext {
 
     public constructor(private definitionId: string, private requestContext: any, private logger: Logger) {
         // GET DEFINITION FOR EXECUTION
-        ExecutionContext._definitionService = new DefinitionService(this.logger)
+        if (!ExecutionContext._definitionService) {
+            ExecutionContext._definitionService = new DefinitionService(this.logger)
+        }
     }
 
     public get definition() {
@@ -39,7 +41,9 @@ export class ExecutionContext {
 
             try {
 
-                if (this._definition) return resolve(this._definition)
+                if (this._definition) {
+                    return resolve(this._definition)
+                }
                 this._definition = await ExecutionContext._definitionService.get(this.definitionId, this.requestContext.id)
                 if (!this._definition) {
                     throw new Error(`Invalid Definition Id`)
@@ -67,7 +71,10 @@ export class ExecutionContext {
 
             try {
                 const definition = await this.resolveDefinition()
-    
+                
+                this.logger.info(this.requestContext.id, 
+                    `definition resolved id: ${definition.id} parameters:${definition.parameters.length} composers:${definition.composers.length} fields:${definition.schema.length} maps:${definition.maps.length} actions:${definition.actions.length}`,
+                    `ExecutionContext.initialize`)
                 if (definition.parameters) {
                     definition.parameters.forEach((item) => {
                         this.addParameter(item.key, item.value, this.requestContext)

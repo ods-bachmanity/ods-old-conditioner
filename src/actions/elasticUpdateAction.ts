@@ -47,6 +47,7 @@ export class ElasticUpdateAction extends BaseAction {
                         doc: _.cloneDeep(this.executionContext.mapped)
                     })
                 })
+                this.logger.info(this.correlationId, `Response from Elastic Update as string: ${response}`, `ElasticUpdateAction.fx`)
                 
                 return resolve(JSON.parse(response))
                 

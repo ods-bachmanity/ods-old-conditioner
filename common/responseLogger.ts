@@ -7,12 +7,7 @@ export class ResponseLogger {
             const endTime = new Date()
             runtime = Math.abs(+endTime - +responseContext.startTime)/1000
         }
-        return JSON.stringify({
-            runtime: runtime,
-            contentLength: responseContext.header('Content-Length'),
-            statusCode: responseContext.statusCode,
-            statusMessage: responseContext.statusMessage
-        })
+        return `runtime: ${runtime}, contentLength: ${responseContext.header('Content-Length')}, statusCode: ${responseContext.statusCode}, statusMessage: ${responseContext.statusMessage}`
 
     }
 

@@ -58,6 +58,9 @@ export class ConditionerRoute {
     
                 const conditionerService = new ConditionerService(this.logger)
                 
+                this.logger.info(requestContext.id, 
+                    `Executing Route for definition ${definitionId}`, 
+                    `ConditionerRoute.executeRoute`)
                 const records: ConditionerResponseSchema = await conditionerService.execute(definitionId, requestContext)
     
                 return resolve(records)
@@ -66,8 +69,8 @@ export class ConditionerRoute {
             catch (err) {
                 const handledError = ErrorHandler.errorResponse(500, requestContext.body.fileuri, requestContext.body.fingerprint, requestContext.body.version,
                     err, [],definitionId, {})
-                    ErrorHandler.logError(requestContext.id, `conditionerRoute.executeRoute.error:`, handledError)
-                    return reject(handledError)
+                ErrorHandler.logError(requestContext.id, `conditionerRoute.executeRoute.error:`, handledError)
+                return reject(handledError)
             }
 
         })

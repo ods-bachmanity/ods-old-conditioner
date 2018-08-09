@@ -79,6 +79,9 @@ export class BulkConditionerRoute {
 
                 const conditionerService = new ConditionerService(this.logger)
                 
+                this.logger.info(requestContext.id, 
+                    `Executing Route for definition ${definitionId}`, 
+                    `BulkConditionerRoute.executeRoute`)
                 const records: ConditionerResponseSchema = await conditionerService.execute(definitionId, requestContext)
     
                 return resolve(records)

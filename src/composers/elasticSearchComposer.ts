@@ -51,6 +51,8 @@ export class ElasticSearchComposer extends BaseComposer {
                 }
                 
                 const response = await rp(endpoint)
+
+                this.logger.info(this.correlationId, `Response from Elastic as string: ${response}`, `ElasticSearchComponent.fx`)
                 const body = JSON.parse(response)
 
                 if (body.httpStatus === 404) {

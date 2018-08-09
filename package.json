@@ -7,7 +7,8 @@
     "start": "nodemon -r ts-node/register index.ts",
     "test": "mocha --require ts-node/register --watch-extensions ts,tsx 'test/**/*.{ts,tsx}'",
     "build": "node -r ts-node/register localbuilder.ts -dev",
-    "bundle": "node -r ts-node/register localbuilder.ts -prod"
+    "bundle": "node -r ts-node/register localbuilder.ts -prod",
+    "loglookup": "node -r ts-node/register log-lookup.ts"
   },
   "repository": "https://github.com/thepepto/ods-conditioner.git",
   "author": "Steven Sederburg <stevens@blackspoke.com>",
