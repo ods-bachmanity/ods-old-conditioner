@@ -14,7 +14,7 @@ export class ConditionerService {
 
                 const executionContext: ExecutionContext = new ExecutionContext(definitionId, requestContext, this.logger)
     
-                const activity = executionContext.execute()
+                const activity = await executionContext.execute()
 
                 return resolve(activity)
 
