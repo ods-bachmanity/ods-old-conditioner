@@ -21,7 +21,7 @@ export class BulkConditionerRoute {
 
                 }
 
-                if (!req.body.files || req.body.files.length <= 0) {
+                if (!req.body || !req.body.files || req.body.files.length <= 0) {
 
                     this.logger.warn(req.id(), `Invalid Request Body. Missing files item`, `BulkConditionerRoute.init.post`)
                     res.send(400, ErrorHandler.errorResponse(400,null,null,null,'Invalid Request Body. Missing files item',[],null,{}))

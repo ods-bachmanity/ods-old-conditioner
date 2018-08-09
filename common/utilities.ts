@@ -89,4 +89,11 @@ export class Utilities {
         })
         
     }
+
+    public static safeReadReqBody(req: any, parameterName: string): string {
+
+        if (!req || !req.body) return ''
+        return req.body[parameterName]
+
+    }
 }

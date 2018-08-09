@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import { HealthCheckRoute, SwaggerRoute, DefinitionRoute, ConditionerRoute, BulkConditionerRoute } from '.'
-import { ErrorHandler, Logger, RequestLogger, ResponseLogger } from '../common'
+import { ErrorHandler, Logger, RequestLogger, ResponseLogger, Utilities } from '../common'
 
 export class Router {
 
@@ -74,7 +74,11 @@ export class Router {
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             
-            res.send(404, ErrorHandler.errorResponse(404,req.body.fileuri,req.body.fingerprint,req.body.version,`Router not found: ${req.url}`,[],req.params.definitionId,{}))
+            res.send(404, ErrorHandler.errorResponse(404,
+                Utilities.safeReadReqBody(req, 'fileuri'),
+                Utilities.safeReadReqBody(req, 'fingerprint'), 
+                Utilities.safeReadReqBody(req, 'version'),
+                `Router not found: ${req.url}`,[],req.params.definitionId,{}))
         })
 
         this.server.on('after', (req, res, route, error) => {

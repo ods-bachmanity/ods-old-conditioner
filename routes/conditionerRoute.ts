@@ -1,6 +1,6 @@
 import { ConditionerResponseSchema } from '../src/schemas'
 import { ConditionerService } from '../src';
-import { ErrorHandler, Logger } from '../common'
+import { ErrorHandler, Logger, Utilities } from '../common'
 
 export class ConditionerRoute {
     
@@ -17,7 +17,11 @@ export class ConditionerRoute {
 
                 if (!req.params || !req.params.definitionId) {         
                     this.logger.warn(req.id(), `Invalid Definition Id`, `ConditionerRoute.init.post`)           
-                    res.send(400, ErrorHandler.errorResponse(400,req.body.fileuri, req.body.fingerprint, req.body.version, 'Invalid Definition Id',[],req.params.definition,{}))
+                    res.send(400, ErrorHandler.errorResponse(400,
+                        Utilities.safeReadReqBody(req, 'fileuri'), 
+                        Utilities.safeReadReqBody(req, 'fingerprint'), 
+                        Utilities.safeReadReqBody(req, 'version'), 
+                        'Invalid Definition Id',[],req.params.definition,{}))
                     return next()
                 }
                 definitionId = req.params.definitionId
@@ -33,7 +37,11 @@ export class ConditionerRoute {
             }
             catch (err) {
                 ErrorHandler.logError(req.id(), `ConditionerRoute.init.post(${path}).error:`, err)
-                const errorResponse = ErrorHandler.errorResponse(400,null,null,null,err,[],definitionId,null)
+                const errorResponse = ErrorHandler.errorResponse(400,
+                    Utilities.safeReadReqBody(req, 'fileuri'), 
+                    Utilities.safeReadReqBody(req, 'fingerprint'), 
+                    Utilities.safeReadReqBody(req, 'version'), 
+                    err,[],definitionId,null)
                 res.send(errorResponse.httpStatus ? errorResponse.httpStatus : 400, errorResponse)
                 return next()
             }
