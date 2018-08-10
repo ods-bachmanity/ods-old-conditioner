@@ -39,12 +39,15 @@ export class ElasticUpdateAction extends BaseAction {
                 }
                 url = url.replace('${fingerprint}', this.executionContext.parameters['fingerprint'])
                 
+                const dataPayload = _.cloneDeep(this.executionContext.mapped)
+                this.logger.log(this.correlationId, `Payload sent to Elastic Update Action: ${JSON.stringify(dataPayload)}`, `ElasticUpdateAction.fx`)
+                
                 const response = await rp.post({
                     headers: {'Content-Type': 'application/json'},
                     url: url,
                     simple: false,
                     body: JSON.stringify({
-                        doc: _.cloneDeep(this.executionContext.mapped)
+                        doc: dataPayload
                     })
                 })
                 this.logger.info(this.correlationId, `Response from Elastic Update as string: ${response}`, `ElasticUpdateAction.fx`)

@@ -58,9 +58,9 @@ export class Router {
             const checkPath = sharePath.startsWith('./') ? path.join(process.cwd(), sharePath) : sharePath
             // Sync version ok here since this executes on start up only
             if (!fs.existsSync(checkPath)) {
-                this.logger.error(`server`, `Invalid serveStaticPath in config file, directory does not exist: ${checkPath}`, `router.init.serveStaticPath`)
+                this.logger.error(`server`, `Invalid serveStaticPath in config file, directory does not exist: ${checkPath}`, `Router.init.serveStaticPath`)
             } else {
-                this.logger.info(`server`, `Serving Static content from ${sharePath}`, `router.init.serveStaticPath`)
+                this.logger.info(`server`, `Serving Static content from ${sharePath}`, `Router.init.serveStaticPath`)
                 this.server.get('/*', restify.plugins.serveStatic({
                     directory: sharePath,
                     default: './index.html'
@@ -70,7 +70,7 @@ export class Router {
 
         // Handle 404
         this.server.on('NotFound', (req, res, next) => {
-            this.logger.error(req.id(), `Router not found: ${req.url}`, `router.init.onnotfound`)
+            this.logger.error(req.id(), `Router not found: ${req.url}`, `Router.init.onnotfound`)
             res.contentType = 'application/json'
             res.header('Content-Type', 'application/json')
             

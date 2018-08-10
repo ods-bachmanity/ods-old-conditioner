@@ -29,18 +29,18 @@ export class BaseTransform {
         const result: Array<Array<number>> = []
         input.forEach((item: CoordinateSchema) => {
             const point = []
-            point.push(item.Longitude)
-            point.push(item.Latitude)
-            point.push(item.Height)
+            point.push(+item.Longitude)
+            point.push(+item.Latitude)
+            point.push(+item.Height)
             result.push(point)
         })
         // Push first point onto the end of the array to close GeoJSON polygon.
         let item: CoordinateSchema = input[0]
         if (result.length < 5) {
             let point = []
-            point.push(item.Longitude)
-            point.push(item.Latitude)
-            point.push(item.Height)
+            point.push(+item.Longitude)
+            point.push(+item.Latitude)
+            point.push(+item.Height)
             result.push(point)
         }
 
