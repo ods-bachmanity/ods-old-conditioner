@@ -50,44 +50,57 @@ export class Utilities {
 
     public readValue(dottedPath: string, source: any): string|any {
 
-        if (dottedPath.indexOf('.') < 0) return source[dottedPath];
-        const paths = dottedPath.split('.');
-        let reader: any = source;
+        if (dottedPath.indexOf('.') < 0) return source[dottedPath]
+        const paths = dottedPath.split('.')
+        let reader: any = source
         paths.forEach((element) => {
-            if (reader != null) reader = reader[element] || null;
+            if (reader != null) reader = reader[element] || null
         })
-        return reader;
+        return reader
 
     }
 
     public writeValue(dottedPath: string, value: any, source: any) {
 
-        if (dottedPath.indexOf('.') < 0) return source[dottedPath] = value;
-        const paths = dottedPath.split('.');
-        let reader: any = source;
+        if (dottedPath.indexOf('.') < 0) return source[dottedPath] = value
+        const paths = dottedPath.split('.')
+        let reader: any = source
         paths.forEach((element, index) => {
             if (index >= paths.length - 1) {
-                return reader[element] = value;
+                return reader[element] = value
             }
-            reader = reader[element];
+            reader = reader[element]
         })
 
     }
 
     public removeElement(dottedPath: string, source: any) {
         if (dottedPath.indexOf('.') < 0) {
-            const reader = source;
-            return delete reader[dottedPath];
+            const reader = source
+            return delete reader[dottedPath]
         }
-        const paths = dottedPath.split('.');
-        let reader: any = source;
+        const paths = dottedPath.split('.')
+        let reader: any = source
         paths.forEach((element, index) => {
             if (index >= paths.length - 1) {
-                return delete reader[element];
+                return delete reader[element]
             }
-            reader = reader[element];
+            reader = reader[element]
         })
         
+    }
+
+    public removeEntireElement(dottedPath: string, source: any) {
+        if (dottedPath.indexOf('.') < 0) {
+            const reader = source
+            return delete reader[dottedPath]
+        }
+        const paths = dottedPath.split('.')
+        let reader: any = source
+        let lagged: any = null
+        paths.forEach((element, index) => {
+            delete reader[element]
+        })
     }
 
     public static safeReadReqBody(req: any, parameterName: string): string {

@@ -53,7 +53,7 @@ export class BulkConditionerRoute {
                         ods_definition: conditionedItem.ods_definition,
                         data: Object.assign({}, conditionedItem.data)
                     }
-                    response.push(output)
+                    response.push(JSON.parse(JSON.stringify(output)))
                 })
 
                 res.end(JSON.stringify(response))

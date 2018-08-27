@@ -72,6 +72,7 @@ export class ExecutionContext {
             try {
                 const definition = await this.resolveDefinition()
                 
+                this.parameters = {}
                 this.logger.info(this.requestContext.id, 
                     `definition resolved id: ${definition.id} parameters:${definition.parameters.length} composers:${definition.composers.length} fields:${definition.schema.length} maps:${definition.maps.length} actions:${definition.actions.length}`,
                     `ExecutionContext.initialize`)
@@ -80,6 +81,14 @@ export class ExecutionContext {
                         this.addParameter(item.key, item.value, this.requestContext)
                     })
                 }
+                this.raw = {}
+                this.transformed = {}
+                this.mapped = {}
+                this.data = {}
+                this.actions = {}
+                this.response = {}
+                this.warnings = []
+                this.errors = []
         
                 return resolve(true)
             }
@@ -260,6 +269,16 @@ export class ExecutionContext {
                         const value = this._utilities.readValue(map.source, this.transformed)
                         if (!isNullOrUndefined(value)) {
                             this._utilities.writeValue(map.target, value, mapObject)
+                        } else {
+                            if (map.valueIfNull) {
+                                this._utilities.writeValue(map.target, map.valueIfNull, mapObject)
+                            }
+                            if (map.removeIfNull) {
+                                this._utilities.removeEntireElement(map.removeIfNull, mapObject)
+                            }
+                            if (!map.valueIfNull && !map.removeIfNull) {
+                                this._utilities.writeValue(map.target, null, mapObject)
+                            }
                         }
                     })
 
@@ -337,6 +356,7 @@ export class ExecutionContext {
                 response.version = this.parameters['version']
                 response.data = JSON.parse(JSON.stringify(this.mapped))
                 response.ods_code = 0
+                response.ods_warnings = JSON.parse(JSON.stringify(this.warnings))
                 response.ods_errors = JSON.parse(JSON.stringify(this.errors))
                 response.ods_definition = this.definitionId
                 

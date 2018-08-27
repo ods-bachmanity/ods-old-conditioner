@@ -3,4 +3,6 @@ export class MapDefSchema {
     public target: string
     public format?: string
     public translator?: any
+    public removeIfNull: string = null
+    public valueIfNull: any = null
 }

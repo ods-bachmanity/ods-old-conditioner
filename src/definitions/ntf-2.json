@@ -26,6 +26,17 @@
             "exactmatch": "NITF02.10"
         },
         {
+            "field": "Metadata.NITF_CSEXRA_ANGLE_TO_NORTH",
+            "ordinal": 0,
+            "required": false,
+            "transforms": [
+                {
+                    "className": "CircularDegreesTransform",
+                    "args": []
+                }
+            ]
+        },
+        {
             "field": "Metadata.NITF_ICORDS",
             "ordinal": 1,
             "required": true,
@@ -105,6 +116,13 @@
                     "name": []
                 }
             }
+        },
+        "DRIDM" : {
+            "ImageProduct" : { 
+                "Image" : {
+                    "OrientationTrueNorthAngle" : 0.000
+                }
+            }
         }
     },
     "maps": [
@@ -127,6 +145,11 @@
         {
             "source": "Metadata.GENC_NAMES",
             "target": "resourcegeographiclocation.geojson.properties.name"
+        },
+        {
+            "source": "Metadata.NITF_CSEXRA_ANGLE_TO_NORTH_CONVERTED",
+            "target": "DRIDM.ImageProduct.Image.OrientationTrueNorthAngle",
+            "removeIfNull": "DRIDM"
         }
     ],
     "actions": [
