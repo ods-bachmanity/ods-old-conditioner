@@ -32,9 +32,6 @@ export class CircularDegreesTransform extends BaseTransform {
 
             this._utilities.writeValue(this.fieldName + '_CONVERTED', newValue, this.executionContext.transformed)
 
-            console.log(`*****************************\n`)
-            console.log(JSON.stringify(this.executionContext.transformed, null, 2) + '\n')
-            console.log(`*****************************\n`)
             return resolve(true)
 
         })

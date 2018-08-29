@@ -54,7 +54,7 @@ export class Utilities {
         const paths = dottedPath.split('.')
         let reader: any = source
         paths.forEach((element) => {
-            if (reader != null) reader = reader[element] || null
+            if (reader !== null) reader = reader[element]
         })
         return reader
 
