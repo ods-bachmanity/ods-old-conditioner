@@ -31,8 +31,26 @@
             "required": false,
             "transforms": [
                 {
-                    "className": "CircularDegreesTransform",
-                    "args": []
+                    "className": "FloatTransform",
+                    "args": [
+                        {"key": "min", "value": 0},
+                        {"key": "max", "value": 359.999999}
+                    ]
+                }
+            ]
+        },
+        {
+            "field": "Metadata.NITF_PIAIMC_CLOUDCVR",
+            "ordinal": 0,
+            "required": false,
+            "transforms": [
+                {
+                    "className": "IntegerTransform",
+                    "args": [
+                        {"key": "min", "value": 0},
+                        {"key": "max", "value": 100},
+                        {"key": "whitelist", "value": [999]}
+                    ]
                 }
             ]
         },
@@ -118,10 +136,13 @@
             }
         },
         "DRIDM" : {
-            "ImageProduct" : { 
+            "ImageProduct" : {
                 "Image" : {
-                    "OrientationTrueNorthAngle" : 0.000
-                }
+                    "OrientationTrueNorthAngle" : 0.000,
+                    "ImageAtmosphericCharacteristic": {
+                        "CloudCoverPercentageRate": 0
+                    }    
+                }            
             }
         }
     },
@@ -147,9 +168,14 @@
             "target": "resourcegeographiclocation.geojson.properties.name"
         },
         {
+            "source": "Metadata.NITF_PIAIMC_CLOUDCVR_CONVERTED",
+            "target": "DRIDM.ImageProduct.Image.ImageAtmosphericCharacteristic.CloudCoverPercentageRate",
+            "removeIfNull": "DRIDM.ImageProduct.Image.ImageAtmosphericCharacteristic"
+        },
+        {
             "source": "Metadata.NITF_CSEXRA_ANGLE_TO_NORTH_CONVERTED",
             "target": "DRIDM.ImageProduct.Image.OrientationTrueNorthAngle",
-            "removeIfNull": "DRIDM"
+            "removeIfNull": "DRIDM.ImageProduct.Image.OrientationTrueNorthAngle"
         }
     ],
     "actions": [

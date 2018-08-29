@@ -100,7 +100,7 @@ export class TaskWorker {
                     }
                 }
 
-                return resolve(Object.assign({}, this.executionContext.transformed))
+                return resolve(JSON.parse(JSON.stringify(this.executionContext.transformed)))
                 
             }
             catch (err) {

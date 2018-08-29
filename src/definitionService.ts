@@ -21,7 +21,7 @@ export class DefinitionService {
 
                 const isInMemoryObject = _.find(this._defs, {id: id})
                 if (isInMemoryObject) {
-                    return resolve(Object.assign({}, isInMemoryObject))
+                    return resolve(JSON.parse(JSON.stringify(isInMemoryObject)))
                 }
                 // __dirname is /app already
                 filePath = path.join(__dirname, 'definitions',id + '.json')

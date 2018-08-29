@@ -215,7 +215,7 @@ export class ExecutionContext {
                     await this.initialize()
                 }
                 // EXECUTE DOCUMENT TRANFORMS
-                if (!this._definition.schema || this._definition.schema.length <= 0) return resolve(Object.assign({}, this.transformed))
+                if (!this._definition.schema || this._definition.schema.length <= 0) return resolve(JSON.parse(JSON.stringify(this.transformed)))
 
                 const maxOrdinal = 10
                 let keepGoing = true
@@ -259,7 +259,7 @@ export class ExecutionContext {
                 if (!this._definition) {
                     await this.initialize()
                 }
-                const mapObject = Object.assign({}, this._definition.mapStructure || {})
+                const mapObject = JSON.parse(JSON.stringify(this._definition.mapStructure || {}))
 
                 const maps = this._definition.maps
                 if (maps && maps.length > 0) {
@@ -267,23 +267,25 @@ export class ExecutionContext {
                     maps.forEach((map: MapDefSchema) => {
 
                         const value = this._utilities.readValue(map.source, this.transformed)
+                        let wasNull = true
                         if (!isNullOrUndefined(value)) {
                             this._utilities.writeValue(map.target, value, mapObject)
-                        } else {
-                            if (map.valueIfNull) {
-                                this._utilities.writeValue(map.target, map.valueIfNull, mapObject)
-                            }
-                            if (map.removeIfNull) {
-                                this._utilities.removeEntireElement(map.removeIfNull, mapObject)
-                            }
-                            if (!map.valueIfNull && !map.removeIfNull) {
-                                this._utilities.writeValue(map.target, null, mapObject)
-                            }
+                            wasNull = false
+                        }
+                        
+                        if (map.valueIfNull && wasNull) {
+                            this._utilities.writeValue(map.target, map.valueIfNull, mapObject)
+                        }
+                        if (map.removeIfNull && wasNull) {
+                            this._utilities.removeElement(map.removeIfNull, mapObject)
+                        }
+                        if (!map.valueIfNull && !map.removeIfNull && wasNull) {
+                            this._utilities.writeValue(map.target, null, mapObject)
                         }
                     })
 
                 }
-                this.mapped = Object.assign({}, mapObject)
+                this.mapped = JSON.parse(JSON.stringify(mapObject))
 
                 return resolve(true)
 

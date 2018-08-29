@@ -1,5 +1,6 @@
 import { ConditionerResponseSchema } from '../src/schemas'
 import { Logger } from './'
+import * as _ from 'lodash'
 
 export class ErrorHandler {
 
@@ -61,7 +62,7 @@ export class ErrorHandler {
                 return `${err.ods_errors.toString()}`
             }
             if (err.message) return err.message
-            return `${JSON.stringify(err)}`
+            return `${err}`
         }
         return `${err}`
 
@@ -75,11 +76,11 @@ export class ErrorHandler {
             if (fingerprint && !err.fingerprint) err.fingerprint = fingerprint
             if (version && !err.version) err.version = version
             if (ods_warnings && ods_warnings.length > 0) {
-                err.ods_warnings.push(ods_warnings)
+                err.ods_warnings = ods_warnings
             }
             if (ods_definition && !err.ods_definition) err.ods_definition = ods_definition
             if (data && !err.data) err.data = data
-            return JSON.parse(JSON.stringify(err))
+            return err
         }
         const result = new ConditionerResponseSchema()
         result.ods_code = -1

@@ -1,4 +1,4 @@
-import { DefinitionSchema, TransformDefSchema, CoordinateSchema } from '../schemas'
+import { DefinitionSchema, TransformDefSchema, CoordinateSchema, KeyValuePair } from '../schemas'
 import { ExecutionContext } from '..'
 import { Logger } from '../../common'
 
@@ -19,6 +19,14 @@ export class BaseTransform {
     public fx(): Promise<Boolean> {
         this.logger.warn(this.correlationId, `Base Transform Ran for ${this.fieldName}`, `BaseTransform.fx`)
         return Promise.resolve(true)
+    }
+
+    protected arg(key: string): any {
+
+        const record: KeyValuePair = _.find(this.transformDef.args, { key: key} )
+        if (record) return record.value
+        return null
+        
     }
 
     protected toGeoJSON(input: Array<CoordinateSchema>): any {

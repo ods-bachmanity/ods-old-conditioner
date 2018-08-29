@@ -36,7 +36,7 @@ export class BulkConditionerRoute {
                 req.body.files.forEach((item) => {
                     const mockRequestBody = { body: item, id: req.id() }
                     workitems.push(this.executeRoute(definitionId, mockRequestBody).then((workItemResponse) => {
-                        responses.push(Object.assign({}, workItemResponse))
+                        responses.push(JSON.parse(JSON.stringify(workItemResponse)))
                     }))
                 })
 
@@ -51,7 +51,7 @@ export class BulkConditionerRoute {
                         ods_errors: conditionedItem.ods_errors,
                         ods_warnings: conditionedItem.ods_warnings,
                         ods_definition: conditionedItem.ods_definition,
-                        data: Object.assign({}, conditionedItem.data)
+                        data: JSON.parse(JSON.stringify(conditionedItem.data))
                     }
                     response.push(JSON.parse(JSON.stringify(output)))
                 })

@@ -143,7 +143,7 @@ class LocalBuilder {
         if (!configContents.package) {
             return false
         }
-        const element = Object.assign({}, configContents.package)
+        const element = JSON.parse(JSON.stringify(configContents.package))
 
         if (!element.dependencies 
             || !element.scripts 

@@ -8,7 +8,8 @@ import {
     UTMSCoordinateTransform,
     HRTECoordinateTransform,
     CoordinateTransform,
-    CircularDegreesTransform
+    FloatTransform,
+    IntegerTransform
 } from '.'
 import { TransformDefSchema } from '../schemas'
 import { ExecutionContext } from '..'
@@ -25,7 +26,8 @@ export class TransformFactory {
         UTMSCoordinateTransform,
         HRTECoordinateTransform,
         CoordinateTransform,
-        CircularDegreesTransform
+        FloatTransform,
+        IntegerTransform
     }
 
     constructor(private logger: Logger) {}
