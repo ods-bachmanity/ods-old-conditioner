@@ -1,0 +1,78 @@
+{
+    "id": "icords",
+    "description": "Do the ICORD thing",
+    "parameters": [
+        {"key": "NITF_IGEOLO", "value": "req.body.NITF_IGEOLO"},
+        {"key": "NITF_ICORDS", "value": "req.body.NITF_ICORDS"}
+    ],
+    "composers": [
+        {
+            "className": "FieldComposer",
+            "args": [
+                { "key": "fields", "value": [
+                    "NITF_IGEOLO", "NITF_ICORDS"
+                ]}
+            ]
+        }
+    ],
+    "schema": [
+        {
+            "field": "Metadata.NITF_ICORDS",
+            "ordinal": 1,
+            "required": true,
+            "mustbeincase": true,
+            "whitelist": [
+                "D","G","N","S","U"
+            ],
+            "blacklist": [],
+            "case": [
+                {
+                    "match": "D",
+                    "className": "DecimalDegreesCoordinateTransform",
+                    "args": []
+                },
+                {
+                    "match": "G",
+                    "className": "GeographicCoordinateTransform",
+                    "args": []
+                },
+                {
+                    "match": "N",
+                    "className": "UTMNCoordinateTransform",
+                    "args": []
+                },
+                {
+                    "match": "S",
+                    "className": "UTMSCoordinateTransform",
+                    "args": []
+                },
+                {
+                    "match": "U",
+                    "className": "UTMMGRSCoordinateTransform",
+                    "args": []
+                }
+            ]
+        }
+    ],
+    "mapStructure": {
+        "wkt": "",
+        "geojson": {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": []
+            }
+        }
+    },
+    "maps": [
+        {
+            "source": "Metadata.COORD_GEOJSON.geometry.coordinates",
+            "target": "geojson.geometry.coordinates"
+        },
+        {
+            "source": "Metadata.COORD_WKT",
+            "target": "wkt"
+        }
+    ],
+    "actions": []
+}

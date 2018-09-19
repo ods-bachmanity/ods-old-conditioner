@@ -90,27 +90,6 @@
                     "args": []
                 }
             ],
-            "transforms-sample": [
-                {
-                    "className": "DateTransform",
-                    "args": [
-                        {"key": "formatFrom", "value":"MM/DD/YYYY"},
-                        {"key": "formatTo", "value": "DD-MON-YYYY"}
-                    ]
-                },
-                {
-                    "className": "GeographicCoordinateTransform"
-                },
-                {
-                    "className": "UTMNCoordinateTransform"
-                },
-                {
-                    "className": "UTMSCoordinateTransform"
-                },
-                {
-                    "className": "UTMMGRSCoordinateTransform"
-                }
-            ],
             "after": [
                 {
                     "className": "CountryCodeTransform",

@@ -1,4 +1,4 @@
-import { BaseComposer, ElasticSearchComposer, TestComposer } from '.'
+import { BaseComposer, ElasticSearchComposer, TestComposer, FieldComposer } from '.'
 import { ComposerDefSchema } from '../schemas'
 import { ExecutionContext } from '..'
 import { Logger } from '../../common'
@@ -7,7 +7,8 @@ export class ComposerFactory {
 
     private _objects: any = {
         ElasticSearchComposer,
-        TestComposer
+        TestComposer,
+        FieldComposer
     }
 
     constructor(private logger: Logger) {}

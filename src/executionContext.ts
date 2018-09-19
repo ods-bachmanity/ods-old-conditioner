@@ -14,7 +14,6 @@ export class ExecutionContext {
     public transformed: any = {}
     public parameters: any = {}
     public mapped: any = {}
-    public data: any = {}
     public actions: any = {}
     public response: any = {}
     public warnings: Array<string> = []
@@ -84,7 +83,6 @@ export class ExecutionContext {
                 this.raw = {}
                 this.transformed = {}
                 this.mapped = {}
-                this.data = {}
                 this.actions = {}
                 this.response = {}
                 this.warnings = []
