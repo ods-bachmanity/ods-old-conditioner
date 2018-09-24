@@ -1,7 +1,9 @@
 import { ExecutionContext } from '..'
 import { TransformDefSchema } from '../schemas'
 import { BaseTransform } from '.'
-import { ErrorHandler } from '../../common'
+import { ErrorHandler, Utilities } from '../../common'
+
+import * as _ from 'lodash'
 
 const rp = require('request-promise')
 
@@ -15,10 +17,17 @@ export class GeographicCoordinateTransform extends BaseTransform {
 
             try {
                 
+                const utilities = new Utilities()
                 if (this.executionContext.transformed.Metadata.COORD_GEOJSON) return resolve(true)
 
                 // # Gather IGEOLO
-                const nitfIGEOLO = this.executionContext.transformed.Metadata.NITF_IGEOLO
+                const arg = _.find(this.transformDef.args, { key: 'igeoloFieldName'})
+
+                // const nitfIGEOLO = this.executionContext.transformed.Metadata.NITF_IGEOLO
+                const nitfIGEOLO = utilities.readValue(arg.value, this.executionContext.transformed)
+
+                console.log(`\n\n\nRAN HERE WITH ${nitfIGEOLO}\n\n\n\n`)
+                
                 if (nitfIGEOLO && nitfIGEOLO.length === 60) {
     
                     // # Put it into format for loading into object.

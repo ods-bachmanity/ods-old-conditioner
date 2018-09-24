@@ -72,7 +72,9 @@
                 {
                     "match": "G",
                     "className": "GeographicCoordinateTransform",
-                    "args": []
+                    "args": [
+                        {"key": "igeoloFieldName", "value": "Metadata.NITF_IGEOLO"}
+                    ]
                 },
                 {
                     "match": "N",

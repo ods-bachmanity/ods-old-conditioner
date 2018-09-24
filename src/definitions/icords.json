@@ -17,7 +17,7 @@
     ],
     "schema": [
         {
-            "field": "Metadata.NITF_ICORDS",
+            "field": "NITF_ICORDS",
             "ordinal": 1,
             "required": true,
             "mustbeincase": true,
@@ -34,7 +34,9 @@
                 {
                     "match": "G",
                     "className": "GeographicCoordinateTransform",
-                    "args": []
+                    "args": [
+                        {"key": "igeoloFieldName", "value": "NITF_IGEOLO"}
+                    ]
                 },
                 {
                     "match": "N",

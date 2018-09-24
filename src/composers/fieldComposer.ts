@@ -16,7 +16,7 @@ export class FieldComposer extends BaseComposer {
         const value = arg.value
 
         value.forEach((item) => {
-            result.Metadata[item] = this.executionContext.getParameterValue(item)
+            result[item] = this.executionContext.getParameterValue(item)
         })
         
         console.log(JSON.stringify(result, null, 2))
